@@ -1,0 +1,30 @@
+{% extends 'user/user_basefile.html' %}
+{% load static %}
+{% block title %}Turf slot details{% endblock title %}
+{% block maincontent %}
+<h1>Reservation Details for {{ selected_date  }}</h1>
+{% if customer_reservations %}
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Turf Name</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in customer_reservations %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ reservation.turf }}</td>
+                    <td>{{ reservation.time_slot.start_time|time:"H:i" }}</td> {# Display time only #}
+                    <td>{{ reservation.time_slot.end_time|time:"H:i" }}</td> {# Display time only #}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No reservations found for the selected date.</p>
+{% endif %}
+{% endblock maincontent  %} 

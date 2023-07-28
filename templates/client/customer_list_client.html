@@ -1,0 +1,67 @@
+{% extends 'client/clientbase.html' %}
+{% load static %}
+{% block tile %}Customer List Client{% endblock tile %}
+{% block maincontent %}
+<div class="content container-fluid">
+    <div class="page-header">
+       <div class="row align-items-center">
+          <div class="col">
+             <h3 class="page-title">Clients</h3>
+             <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                <li class="breadcrumb-item active">Customers</li>
+             </ul>
+          </div>
+       </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card card-table">
+             <div class="card-body">
+                <div class="table-responsive">
+                   <table class="table table-hover table-center mb-0 datatable">
+                      <thead>
+                         <tr>
+                            <th>ID</th>
+                            <th>User Name</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Mobile Number</th>
+                            <th>Address</th>
+                            <th>Created At</th>
+
+                            
+                         </tr>
+                      </thead>
+                        <tbody>
+                           {% for customer  in customers  %}
+                         <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ customer.admin.username }}</td>
+                            <td>{{customer.admin.first_name}}</td>
+                            <td>{{customer.admin.last_name}}</td>
+                            <td>{{ customer.admin.email }}</td>
+                            <td>{{ customer.mobile }}</td>
+                            <td>{{ customer.address }}</td>
+                            <td>{{ customer.created_at }}</td>
+
+                            <td class="text-right">
+                               <div class="actions">
+                                  
+                                  <a href="{% url 'delete_customer_client' customer.id %}" class="btn btn-sm bg-danger-light">
+                                  <i class="fas fa-trash"></i>
+                                  </a>
+                               </div>
+                            </td>
+                         </tr>
+                         {% endfor %}
+                        </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+{% endblock maincontent %}

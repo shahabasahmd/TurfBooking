@@ -1,0 +1,167 @@
+{% extends 'client/clientbase.html' %}
+{% load static %}
+{% block maincontent %}
+<div class="content container-fluid">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">{{ turf.turf_name }} Ground Details</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="#">Clients</a></li>
+                    <li class="breadcrumb-item active">{{ turf.turf_name }}</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <!-- Add link to edit turf details or other actions -->
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-center mb-0 datatable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Ground Name</th>
+                                    <th>Category</th>
+                                    <th>Price Per Hour</th>
+                                    
+                                    <!-- Add more fields if needed -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if grounds %}
+                                {% for ground in grounds %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ ground.ground_name }}</td>
+                                    <td>{{ ground.category }}</td>
+                                    <td>{{ ground.price }}</td>
+                                    <td class="text-right">
+                                       <div class="actions">
+                                          
+                                         <form method="post" action="{% url 'delete_ground_client' ground.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm bg-danger-light">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                       </div>
+                                    </td>
+                                    <!-- Add more fields if needed -->
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4">No ground details found for this turf.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock maincontent %}
+
+
+
+{% comment %} {% extends 'admin/adminbase.html' %}
+{% block tile %}Lsit Turf Details{% endblock tile %}
+{% block maincontent %}
+<div class="content container-fluid">
+    <div class="page-header">
+       <div class="row align-items-center">
+          <div class="col">
+             <h3 class="page-title">Clients</h3>
+             <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                <li class="breadcrumb-item active">Clients</li>
+             </ul>
+          </div>
+          <div class="col-auto text-right float-right ml-auto">
+             <a href="{% url 'add_turf_page' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add Turf Details </a>
+             
+          </div>
+          <div class="col-auto text-right float-right ml-auto">
+            <a href="{% url 'add_turf_page' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add ground Details </a>
+            
+         </div>
+       </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card card-table">
+             <div class="card-body">
+                <div class="table-responsive">
+                   <table class="table table-hover table-center mb-0 datatable">
+                      <thead>
+                         <tr>
+                            <th>No</th>
+                            <th> Turf Name</th>
+                            <th>Place</th>
+                            
+                            
+                            <th>Category</th>
+                            <th>Ground Name</th>
+                            <th>Price Per Hour</th>
+                            <th>delete Ground</th>
+                            
+
+
+                            
+                         </tr>
+                      </thead>
+                        <tbody>
+                            {% if turfs %}
+                            {% for turf in turfs %}
+                         <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td></td>
+                            <td></td>
+                            
+                            
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            
+                            
+                            
+                            <td class="text-right">
+                               <div class="actions">
+                                  
+                                 <form method="post" action="#">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm bg-danger-light">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                               </div>
+                            </td>
+                         </tr>
+                         {% endfor %}
+                         {% else %}
+                                <p>No turf details found for this client.</p>
+                            {% endif %}
+
+                        </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+
+{% endblock maincontent %} {% endcomment %}
+

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+{% load static %}
+<html style="font-size: 16px;" lang="en"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="ABOUT US..., Who We Are:, Our Mission:, What We Offer:">
+    <meta name="description" content="">
+    <title>About</title>
+    <link rel="stylesheet" href="{% static 'css/nicepage.css' %}" media="screen">
+<link rel="stylesheet" href="{% static 'css/About.css' %}" media="screen">
+    <script class="u-script" type="text/javascript" src="{% static 'js/jquery.js' %}" defer=""></script>
+    <script class="u-script" type="text/javascript" src="{% static 'js/nicepage.js' %}" defer=""></script>
+    <meta name="generator" content="Nicepage 5.12.7, nicepage.com">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+    
+    
+    
+    <script type="application/ld+json">{
+		"@context": "http://schema.org",
+		"@type": "Organization",
+		"name": "",
+		"logo": "{% static 'images/img.png' %}",
+		"sameAs": []
+}</script>
+    <meta name="theme-color" content="#478ac9">
+    <meta property="og:title" content="About">
+    <meta property="og:type" content="website">
+  <meta data-intl-tel-input-cdn-path="intlTelInput/"></head>
+  <body class="u-body u-xl-mode" data-lang="en"><header class="u-clearfix u-header u-header" id="sec-fb6a"><div class="u-clearfix u-sheet u-sheet-1">
+    <nav class="u-menu u-menu-dropdown u-offcanvas u-menu-1">
+      <div class="menu-collapse" style="font-size: 1rem; letter-spacing: 0px; text-transform: uppercase; font-weight: 500;">
+        <a class="u-button-style u-custom-active-border-color u-custom-active-color u-custom-border u-custom-border-color u-custom-borders u-custom-hover-border-color u-custom-hover-color u-custom-left-right-menu-spacing u-custom-padding-bottom u-custom-text-active-color u-custom-text-color u-custom-text-decoration u-custom-text-hover-color u-custom-top-bottom-menu-spacing u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base" href="#" style="padding: 8px; font-size: calc(1em + 16px);">
+          <svg class="u-svg-link" viewBox="0 0 24 24"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#menu-hamburger"></use></svg>
+          <svg class="u-svg-content" version="1.1" id="menu-hamburger" viewBox="0 0 16 16" x="0px" y="0px" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g><rect y="1" width="16" height="2"></rect><rect y="7" width="16" height="2"></rect><rect y="13" width="16" height="2"></rect>
+</g></svg>
+            </a>
+          </div>
+          <div class="u-custom-menu u-nav-container">
+            <ul class="u-nav u-spacing-4 u-unstyled u-nav-1"><li class="u-nav-item"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-grey-90 u-text-hover-white" href="/" style="padding: 26px 22px;">Home</a>
+</li><li class="u-nav-item"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-grey-90 u-text-hover-white" href="{% url 'about' %}" style="padding: 26px 22px;">About</a>
+</li><li class="u-nav-item"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-grey-90 u-text-hover-white" href="Contact.html" style="padding: 26px 22px;">Contact</a>
+{% if request.user.is_authenticated %}
+</li><li class="u-nav-item dropdown"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-primary-90 u-text-hover-white"  style="padding: 26px 22px;">{{request.user}}</a>
+     </li> 
+</li><li class="u-nav-item"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-primary-90 u-text-hover-white" style="padding: 26px 22px;" href="{% url 'dologout' %}">Logout</a> </li>    
+    
+{% else %}
+<li class="u-nav-item"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-grey-90 u-text-hover-white" href="{% url 'loginpage' %}" style="padding: 26px 22px;">Login</a></li>
+{% endif %}
+</ul>
+          </div>
+
+          <!-- this area for mobile view  -->
+          <div class="u-custom-menu u-nav-container-collapse">
+            <div class="u-black u-container-style u-inner-container-layout u-opacity u-opacity-95 u-sidenav">
+              <div class="u-inner-container-layout u-sidenav-overflow">
+                <div class="u-menu-close"></div>
+                <ul class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2"><li class="u-nav-item"><a class="u-button-style u-nav-link" href="#">Home</a>
+</li><li class="u-nav-item"><a class="u-button-style u-nav-link" href="{% url 'about' %}">About</a>
+</li><li class="u-nav-item"><a class="u-button-style u-nav-link" href="#">Contact</a>
+{% if request.user.is_authenticated %}
+    </li><li class="u-nav-item dropdown"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-primary-90 u-text-hover-white"  style="padding: 26px 22px;">{{request.user}}</a></li> 
+    </li><li class="u-nav-item"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-primary-90 u-text-hover-white" style="padding: 26px 22px;" href="{% url 'dologout' %}">Logout</a> </li>    
+{% else %}
+    <li class="u-nav-item"><a class="u-active-palette-1-base u-border-active-palette-1-base u-border-hover-palette-1-light-1 u-border-no-left u-border-no-right u-border-no-top u-button-style u-hover-palette-1-light-1 u-nav-link u-text-active-white u-text-grey-90 u-text-hover-white" href="{% url 'loginpage' %}" style="padding: 26px 22px;">Login</a></li>
+{% endif %}
+</li></ul>
+              </div>
+            </div>
+            <div class="u-black u-menu-overlay u-opacity u-opacity-70"></div>
+          </div>
+        </nav>
+        <a href="" class="u-image u-logo u-image-1" data-image-width="256" data-image-height="150">
+          <img src="{% static 'images/img.png' %}" class="u-logo-image u-logo-image-1">
+        </a>
+      </div></header>
+    <section class="u-clearfix u-section-1" id="sec-4c36">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-list u-list-1">
+          <div class="u-repeater u-repeater-1">
+            <div class="u-container-style u-custom-item u-grey-5 u-list-item u-repeater-item" data-animation-name="" data-animation-duration="0" data-animation-delay="0" data-animation-direction="">
+              <div class="u-container-layout u-similar-container u-valign-top u-container-layout-1">
+                <h4 class="u-custom-item u-text u-text-1">ABOUT US...</h4>
+                <p class="u-custom-item u-text u-text-2">Welcome to our online football turf booking website! We are dedicated to providing you with a seamless and convenient way to book football turfs for your games and training sessions. Here's some information about us:</p>
+              </div>
+            </div>
+            <div class="u-container-style u-custom-item u-grey-5 u-list-item u-repeater-item" data-animation-name="" data-animation-duration="0" data-animation-delay="0" data-animation-direction="">
+              <div class="u-container-layout u-similar-container u-valign-top u-container-layout-2">
+                <h4 class="u-custom-item u-text u-text-3">Who We Are:</h4>
+                <p class="u-custom-item u-text u-text-4">We are a passionate team of sports enthusiasts who understand the importance of having a reliable and accessible platform for booking football turfs. We believe that everyone should have the opportunity to enjoy the game they love, and we aim to make it easier for football players to find and reserve turfs at their preferred locations.</p>
+              </div>
+            </div>
+            <div class="u-container-style u-custom-item u-grey-5 u-list-item u-repeater-item" data-animation-name="" data-animation-duration="0" data-animation-delay="0" data-animation-direction="">
+              <div class="u-container-layout u-similar-container u-valign-top u-container-layout-3">
+                <h4 class="u-custom-item u-text u-text-5">Our Mission:</h4>
+                <p class="u-custom-item u-text u-text-6">Our mission is to connect football players with high-quality turfs, enabling them to engage in their favorite sport without any hassle. We strive to create a user-friendly online platform that offers a wide range of turf options, making it simple for players to find and book their desired playing space. Our ultimate goal is to enhance the overall football experience for players of all ages and skill levels.</p>
+              </div>
+            </div>
+            <div class="u-container-style u-custom-item u-grey-5 u-list-item u-repeater-item" data-animation-name="" data-animation-duration="0" data-animation-delay="0" data-animation-direction="">
+              <div class="u-container-layout u-similar-container u-valign-top u-container-layout-4">
+                <h4 class="u-custom-item u-text u-text-7">What We Offer:</h4>
+                <p class="u-custom-item u-text u-text-8">Easy-to-use interface: Our website is designed to be intuitive and user-friendly, ensuring a smooth booking experience.<br>Extensive turf options: We partner with multiple turf providers, giving you access to a wide range of turfs with different sizes, surfaces, and facilities.<br>Real-time availability: You can view the real-time availability of turfs, enabling you to plan your game or training session accordingly.<br>Secure payment: We prioritize the security of your transactions and offer secure online payment options for a seamless booking process.<br>Customer support: Our dedicated customer support team is available to assist you with any queries or concerns you may have during the booking process.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="u-align-center u-clearfix u-grey-5 u-section-2" id="sec-fc09">
+      <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+        <p class="u-text u-text-1">Thank you for choosing our online football turf booking website. We look forward to serving you and contributing to your enjoyable football experiences.</p>
+      </div>
+    </section>
+    
+    
+    <footer class="u-clearfix u-footer u-grey-80" id="sec-0e80"><div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-align-left u-social-icons u-spacing-10 u-social-icons-1">
+         
+        </div>
+      </div></footer>
+    
+  
+</body></html>

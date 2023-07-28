@@ -1,0 +1,13 @@
+{% extends 'client/clientbase.html' %}
+{% block title %}Confirm Turf Deletion{% endblock title %}
+{% block maincontent %}
+<div class="container">
+    <h1>Confirm Turf Deletion</h1>
+    <p>Are you sure you want to delete the turf "{{ turf.turf_name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <input type="submit" value="Confirm Delete" class="btn btn-danger">
+        <a href="{% url 'client_turf_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock maincontent %}

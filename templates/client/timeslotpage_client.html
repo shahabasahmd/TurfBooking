@@ -1,0 +1,71 @@
+{% extends 'client/clientbase.html' %}
+{% block tile %}Lsit Turf Details{% endblock tile %}
+{% block maincontent %}
+
+
+
+
+<div class="content container-fluid">
+    <div class="page-header">
+       <div class="row align-items-center">
+          <div class="col">
+             <h3 class="page-title">Add Time Slot Details</h3>
+             <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Timeslot</a></li>
+                <li class="breadcrumb-item active">Add Time Slot Details</li>
+             </ul>
+          </div>
+       </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card">
+             <div class="card-body">
+               <form method="post" action="{% url 'timeslot_page_client' %}" >
+                  {% csrf_token %}
+                  <div class="row">
+                      
+                      {% include 'include/messeges.html' %}
+
+                      <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                           <label>Turf Name</label>
+                           <select class="form-control" name="turf_name" required>
+                            <option > Choose one</option>
+                            {% for turf in user_turfs %}
+                                <option value="{{ turf.id }}">{{ turf.turf_name }}</option>
+                            {% endfor %}
+                           </select>
+                        </div>
+                     </div> 
+                     <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label  >Date</label>
+                            <input type="date" class="form-control"name="day" id="day" required>
+                        </div>
+                    </div> 
+                      <div class="col-12 col-sm-6">
+                          <div class="form-group">
+                              <label for="start_time">Start Time</label>
+                              <input type="time" name="start_time" id="start_time" class="form-control" required>
+                          </div>
+                      </div>
+                      <div class="col-12 col-sm-6">
+                          <div class="form-group">
+                              <label for="end_time" >End Time</label>
+                              <input type="time" name="end_time" id="end_time"  class="form-control" required>
+                          </div>
+                      </div>
+                       <div class="col-12">
+                          <input type="submit"  value="Add Timeslot"class="btn btn-primary">
+                      </div>
+                  </div>
+              </form>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+
+
+{% endblock maincontent %}

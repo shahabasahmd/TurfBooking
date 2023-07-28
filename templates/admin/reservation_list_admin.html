@@ -1,0 +1,30 @@
+<!-- reservation_list_admin.html -->
+{% extends 'admin/adminbase.html' %}
+{% block title %}Reservation List{% endblock title %}
+{% block maincontent %}
+    <h1>Reservation List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Customer</th>
+                <th>Turf</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Reservation Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ reservation.customer.user.username }}</td>
+                <td>{{ reservation.turf }}</td>
+                <td>{{ reservation.time_slot.start_time|time:"H:i" }}</td>
+                <td>{{ reservation.time_slot.end_time|time:"H:i" }}</td>
+                <td>{{ reservation.reservation_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock maincontent %}

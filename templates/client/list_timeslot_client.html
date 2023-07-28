@@ -1,0 +1,74 @@
+{% extends 'client/clientbase.html' %}
+{% block tile %}Lsit TimeSlot Details{% endblock tile %}
+{% block maincontent %}
+
+<div class="content container-fluid">
+    <div class="page-header">
+       <div class="row align-items-center">
+          <div class="col">
+             <h3 class="page-title">Clients</h3>
+             <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                <li class="breadcrumb-item active">Clients</li>
+             </ul>
+          </div>
+          <div class="col-auto text-right float-right ml-auto">
+             <a href="{% url 'timeslot_page_client' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add TimeSlot Details </a>
+             
+          </div>
+       </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card card-table">
+             <div class="card-body">
+                <div class="table-responsive">
+                   <table class="table table-hover table-center mb-0 datatable">
+                      <thead>
+                           <tr>
+                            <th>No</th>
+                            
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                           </tr>
+                      </thead>
+                        <tbody>
+                           {% if timeslots %}
+                           {% for timeslot in timeslots %}
+                         <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td> {{ timeslot.day }}</td>
+                            <td>{{ timeslot.start_time }}</td>
+                            <td>{{ timeslot.end_time }}</td>
+                            
+                            <td class="text-right">
+                               <div class="actions">
+                                 <form method="post" action="{% url 'delete_timeslot_client' turf.id timeslot.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm bg-danger-light">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                  
+                               </div>
+                            </td>
+                         </tr>
+                         {% endfor %}
+                         {% else %}
+                                <p>No Timeslot details found </p>
+                            {% endif %}
+
+                        </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div> 
+
+
+
+
+{% endblock maincontent %}

@@ -1,0 +1,119 @@
+{% extends 'client/clientbase.html' %}
+{% block tile %}add Turf{% endblock tile %}
+{% block maincontent %}
+<div class="content container-fluid">
+    <div class="page-header">
+       <div class="row align-items-center">
+          <div class="col">
+             <h3 class="page-title">Add Turf Details</h3>
+             <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="teachers.html">Turf</a></li>
+                <li class="breadcrumb-item active">Add Turf Details</li>
+             </ul>
+          </div>
+       </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card">
+             <div class="card-body">
+               <form method="post" action="{% url 'save_turf_client' %}" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="row">
+                      <div class="col-12">
+                          <h5 class="form-title"><span>Basic Details</span></h5>
+                      </div>
+                      {% include 'include/messeges.html' %}
+                      <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label>Turf Image</label>
+                            <input type="file" class="form-control" name="turf_image" required>
+                        </div>
+                      </div> 
+                      <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label>Turf name</label>
+                            <input type="text" class="form-control" name="turf_name" required>
+                        </div>
+                      </div>
+                      <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label>Place</label>
+                            <input type="text" class="form-control" name="place" required>
+                        </div>
+                      </div> 
+                      <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label>Mobile number</label>
+                            <input type="number" class="form-control" name="mobile" required>
+                        </div>
+                      </div>
+                      <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                           <label>Cafe</label>
+                           <select class="form-control" name="cafe">
+                              <option >Choose one</option>
+                              <option value="cafe_yes">Yes</option>
+                              <option value="cafe_no">No</option>
+                            </select>
+                        </div>
+                     </div> 
+                     <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                           <label>Firstaid</label>
+                           <select class="form-control" name="firstaid">
+                              <option >Choose one</option>
+                              <option value="firstaid_yes">Yes</option>
+                              <option value="firstaid_no">No</option>
+                            </select>
+                        </div>
+                     </div> 
+                     <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                           <label>Locker</label>
+                           <select class="form-control" name="locker">
+                              <option >Choose one</option>
+                              <option value="locker_yes">Yes</option>
+                              <option value="locker_no">No</option>
+                            </select>
+                        </div>
+                     </div> 
+                     <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                           <label>Parking</label>
+                           <select class="form-control" name="parking">
+                              <option >Choose one</option>
+                              <option value="parking_yes">Yes</option>
+                              <option value="parking_no">No</option>
+                            </select>
+                        </div>
+                     </div> 
+                     <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                           <label>Shower</label>
+                           <select class="form-control" name="shower">
+                              <option >Choose one</option>
+                              <option value="shower_yes">Yes</option>
+                              <option value="shower_no">No</option>
+                            </select>
+                        </div>
+                     </div> 
+
+              
+                      
+                      
+
+                      
+              
+                      <div class="col-12">
+                          <button type="submit" class="btn btn-primary">Submit</button>
+                      </div>
+                  </div>
+              </form>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+
+{% endblock maincontent %}

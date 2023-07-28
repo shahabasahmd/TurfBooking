@@ -1,0 +1,21 @@
+{% extends 'client/clientbase.html' %}
+{% block tile %}Turf list{% endblock tile %}
+{% block maincontent %}
+<div class="row">
+    {% for turf in turfs %}
+    <div class="col-xl-4 col-sm-6 col-12">
+        <a href="{% url 'timeslot_list_client' turf.id  %}">
+            <div class="card flex-fill twitter sm-box">
+                <h6 class="text-capitalize">{{turf.turf_name }}</h6>
+                <p>Uploaded By: {{ turf.added_by.username }}</p>
+            </div>
+        </a>
+    </div>
+    {% if forloop.counter|divisibleby:3 %}
+    </div><div class="row">
+    {% endif %}
+    {% endfor %}
+</div>
+
+
+{% endblock maincontent %}

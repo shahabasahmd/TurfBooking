@@ -1,0 +1,95 @@
+{% extends 'admin/adminbase.html' %}
+{% block tile %}Lsit Turf Details{% endblock tile %}
+{% block maincontent %}
+<div class="content container-fluid">
+    <div class="page-header">
+       <div class="row align-items-center">
+          <div class="col">
+             <h3 class="page-title">Clients</h3>
+             <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                <li class="breadcrumb-item active">Clients</li>
+             </ul>
+          </div>
+          <div class="col-auto text-right float-right ml-auto">
+             <a href="{% url 'add_turf_page' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add Turf Details </a>
+             
+          </div>
+          <div class="col-auto text-right float-right ml-auto">
+            <a href="{% url 'add_ground_page_admin' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add ground Details </a>
+            
+         </div>
+       </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card card-table">
+             <div class="card-body">
+                <div class="table-responsive">
+                   <table class="table table-hover table-center mb-0 datatable">
+                      <thead>
+                         <tr>
+                            <th>No</th>
+                            <th> Turf Name</th>
+                            <th>Place</th>
+                            
+                            
+                            <th>Added By</th>
+                            <th>Mobile Number</th>
+                            <th>Cafe</th>
+                            <th>Firstaid</th>
+                            <th>Locker</th>
+                            <th>Parking</th>
+                            <th>shower</th>
+                            <th>Delete Turf</th>
+
+
+                            
+                         </tr>
+                      </thead>
+                        <tbody>
+                            {% if turfs %}
+                            {% for turf in turfs %}
+                         <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="{% url 'ground_details_page' turf_id=turf.id %}">{{ turf.turf_name }}</a></td>
+                            <td>{{turf.place}}</td>
+                            
+                            
+                            <td>{{turf.added_by }}</td>
+                            <td>{{turf.phone }}</td>
+                            <td>{{turf.cafe }}</td>
+                            <td>{{turf.first_aid }}</td>
+                            <td>{{turf.locker }}</td>
+                            <td>{{turf.parking }}</td>
+                            <td>{{turf.shower }}</td>
+                            
+                            
+                            
+                            <td class="text-right">
+                               <div class="actions">
+                                  
+                                 <form method="post" action="{% url 'delete_turf_admin' turf_id=turf.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm bg-danger-light">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                               </div>
+                            </td>
+                         </tr>
+                         {% endfor %}
+                         {% else %}
+                                <p>No turf details found for this client.</p>
+                            {% endif %}
+
+                        </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+
+{% endblock maincontent %}
