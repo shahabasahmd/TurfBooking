@@ -1,68 +1,75 @@
 {% extends 'admin/adminbase.html' %}
 {% load static %}
+
 {% block maincontent %}
 <div class="content container-fluid">
     <div class="page-header">
-       <div class="row align-items-center">
-          <div class="col">
-             <h3 class="page-title">Clients</h3>
-             <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-                <li class="breadcrumb-item active">Clients</li>
-             </ul>
-          </div>
-          <div class="col-auto text-right float-right ml-auto">
-             <a href="{% url 'addclient' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add Clients</a>
+        <div class="row align-items-center">
+           <div class="col">
+              <h3 class="page-title">Clients</h3>
+              <ul class="breadcrumb">
+                 <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                 <li class="breadcrumb-item active">Clients</li>
+              </ul>
+           </div>
+
+           <div class="col-auto text-right float-right ml-auto">
+             <a href="{% url 'blocked_clients' %}" class="btn btn-outline-primary mr-2">Blocked Clients</a>
              
           </div>
-       </div>
-    </div>
-    <div class="row">
-       <div class="col-sm-12">
-          <div class="card card-table">
-             <div class="card-body">
-                <div class="table-responsive">
-                   <table class="table table-hover table-center mb-0 datatable">
-                      <thead>
-                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Mobile Number</th>
-                            <th>Address</th>
-                            
-                         </tr>
-                      </thead>
-                        <tbody>
-                           {% for i in client %}
-                         <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>
-                               <h2 class="table-avatar">
-                                  
-                                  <a href="#">{{i.admin.first_name }}  {{i.admin.last_name}}</a>
-                               </h2>
-                            </td>
-                            <td>{{i.admin.email}}</td>
-                            <td>{{i.mobile}}</td>
-                            <td>{{i.address}}</td>
-                            <td class="text-right">
-                               <div class="actions">
-                                  
-                                  <a href="{% url 'delete_client' i.admin.id  %}" class="btn btn-sm bg-danger-light">
-                                  <i class="fas fa-trash"></i>
-                                  </a>
-                               </div>
-                            </td>
-                         </tr>
-                         {% endfor %}
-                        </tbody>
-                   </table>
+        </div>
+     </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+       <div class="card card-table">
+          <div class="card-body">
+             <div class="table-responsive">
+                <table class="table table-hover table-center mb-0 datatable">
+                   <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Mobile Number</th>
+                                    <th>Address</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in client %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <h2 class="table-avatar">
+                                            <a href="#">{{ i.admin.first_name }} {{ i.admin.last_name }}</a>
+                                        </h2>
+                                    </td>
+                                    <td>{{ i.admin.email }}</td>
+                                    <td>{{ i.mobile }}</td>
+                                    <td>{{ i.address }}</td>
+                                    <td class="text-right">
+                                        <div class="actions">
+                                            <a href="{% url 'delete_client' i.admin.id  %}" class="btn btn-sm bg-danger-light">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            
+                                            <a href="{% url 'block_client' i.admin.id %}" class="btn btn-sm bg-success-light">
+                                                Block
+                                            </a>
+       
+        
+    
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-             </div>
-          </div>
-       </div>
+            </div>
+        </div>
     </div>
- </div>
-
+</div>
 {% endblock maincontent %}

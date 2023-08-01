@@ -6,8 +6,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import update_session_auth_hash,authenticate
+from datetime import datetime, timedelta
 
-
+@login_required(login_url='/')
 def clienthome(request ):
     user = request.user
     client = Clients.objects.filter(admin=user).first()
@@ -194,25 +195,105 @@ def delete_turf_confirmation(request, turf_id):
 def client_turf_list_timeslot(request):
 
     turfs = TurfDetails.objects.filter(added_by=request.user)
+    context = {
+        'turfs': turfs,
+    }
 
-    return render(request, 'client/turflist_timeslot_client.html', {'turfs': turfs})
-
-
-
-
-@login_required
-def get_user_turf_details(user):
-    # Replace this query with your logic to fetch user-specific turf details
-    user_turfs = TurfDetails.objects.filter(owner=user)
-    return user_turfs
-
-@login_required
-def timeslot_page_client(request):
-    user_turfs = get_user_turf_details(request.user)
-    context = {'user_turfs': user_turfs}
     return render(request, 'client/timeslotpage_client.html', context)
 
+  
+@login_required
+def add_time_slot_client(request):
+    if request.method == 'POST':
+        turf_id = request.POST.get('turf_name')
+        ground_id = request.POST.get('ground_name')
+        match_duration = float(request.POST.get('match_duration'))
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
 
+        # Convert start_time and end_time to datetime objects
+        from datetime import datetime
+        start_datetime = datetime.strptime(start_time, '%H:%M')
+        end_datetime = datetime.strptime(end_time, '%H:%M')
+
+        # Calculate the number of time slots to create
+        time_slot_count = int((end_datetime - start_datetime).seconds / (match_duration * 3600))
+
+        # Save the time slots
+        for i in range(time_slot_count):
+            time_slot = TimeSlot.objects.create(
+                added_by=request.user,  # Add the added_by field here with the currently logged-in user
+                ground_id=ground_id,
+                date=request.POST.get('day'),
+                start_time=start_datetime.time(),
+                end_time=(start_datetime + timedelta(hours=match_duration)).time()
+            )
+            start_datetime += timedelta(hours=match_duration)
+
+        # Redirect to a success page after successful data submission
+        return redirect('success_page')
+
+    # If the request method is GET, render the form page
+    return render(request, 'client/timeslotpage_client.html', context={})
+
+
+@login_required
+def turf_list_timeslot(request):
+    turf = TurfDetails.objects.filter(added_by=request.user)
+    return render(request, 'client/turflist_timeslot_client.html', {'turfs': turf})
+
+
+def ground_list(request, turf_id):
+    turf = get_object_or_404(TurfDetails, id=turf_id)
+    grounds = Ground.objects.filter(turf=turf)
+    return render(request, 'client/groundlist_timeslot_client.html', {'turf': turf, 'grounds': grounds})
+
+
+def timeslot_list(request, ground_id):
+    ground = get_object_or_404(Ground, id=ground_id)
+    timeslots = TimeSlot.objects.filter(ground=ground)
+    return render(request, 'client/list_timeslot_client.html', {'ground': ground, 'timeslots': timeslots})
+
+
+
+def delete_timeslot_client(request, timeslot_id):
+    timeslot = get_object_or_404(TimeSlot, pk=timeslot_id)
+    ground_id = timeslot.ground.id  # Assuming Timeslot model has a foreign key to the Ground model
+
+    if request.method == 'POST':
+        timeslot.delete()
+        return redirect('timeslot_list_client', ground_id=ground_id)
+    
+    return render(request, 'client/list_timeslot_client.html', {'timeslot': timeslot})
+
+
+@login_required
+def turf_list_reservation(request):
+    t = TurfDetails.objects.filter(added_by=request.user)
+    return render(request, 'client/turflist_reservation_client.html', {'turfs': t})
+
+@login_required
+def ground_list_reservation(request,turf_id):
+    turf = get_object_or_404(TurfDetails, id=turf_id)
+    grounds = Ground.objects.filter(turf=turf)
+    return render(request, 'client/groundlist_reservation_client.html', {'turf': turf, 'grounds': grounds})
+
+
+def select_date_and_reservations(request, ground_id):
+    selected_date = request.GET.get('selected_date')
+
+    # Convert the selected_date to a Python datetime object if it exists
+    if selected_date:
+        selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+
+    # Get the specific ground based on the ground_id
+    ground = get_object_or_404(Ground, id=ground_id)
+
+    # Filter reservations for the selected date and ground
+    reservations = Reservation.objects.filter(ground=ground, time_slot__date=selected_date) if selected_date else []
+
+    # Render the template with the necessary context
+    return render(request, 'client/ground_reservation_details_client.html', {'ground': ground, 'selected_date': selected_date, 'reservations': reservations})
 # def timeslot_page_client(request):
 #     if request.method == 'POST':
 #         turf_id = request.POST.get('turf_name')

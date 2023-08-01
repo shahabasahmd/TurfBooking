@@ -1,0 +1,63 @@
+{% extends 'admin/adminbase.html' %}
+{% load static %}
+
+{% block maincontent %}
+    <div class="content container-fluid">
+        <div class="page-header">
+            <div class="row align-items-center">
+                <!-- Rest of the page header content -->
+
+                <div class="col-auto text-right float-right ml-auto">
+                    <a href="{% url 'adminhome' %}" class="btn btn-outline-primary mr-2">All Clients</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card card-table">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center mb-0 datatable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Mobile Number</th>
+                                        <th>Address</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for client  in blocked_clients %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <h2 class="table-avatar">
+                                                <a href="#">{{ client.first_name }} {{  client.last_name}}</a>
+                                            </h2>
+                                        </td>
+                                        <td>{{ client.email }}</td>
+                                        <td>{{ client.clients.mobile }}</td>
+                                        <td>{{ client.clients.address }}</td>
+                                        
+                                        <td class="text-right">
+                                            <div class="actions">
+
+                                                <a href="{% url 'unblock_client' client.id %}" class="btn btn-sm bg-success-light">
+                                                    Unblock
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock maincontent %}

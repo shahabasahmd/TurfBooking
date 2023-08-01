@@ -38,8 +38,8 @@
                  <li class="submenu">
                     <a href="#"><i class="fas fa-clock"></i> <span> Time Slots</span> <span class="menu-arrow"></span></a>
                     <ul>
-                       <li><a href="#">Time Slot List</a></li>
-                       <li><a href="#"> Add Time slot</a></li>
+                       <li><a href="{% url 'turf_list_for_timeslot_client' %}">Time Slot List</a></li>
+                       <li><a href="{% url 'turf_list_timeslot_client' %}"> Add Time slot</a></li>
                        
                     </ul>
                  </li>
@@ -48,7 +48,7 @@
                  </li>
                  
                  <li>
-                    <a href="#"><i class="fas fa-holly-berry"></i> <span>Reservations</span></a>
+                    <a href="{% url 'turf_list_reservation_client' %}"><i class="fas fa-holly-berry"></i> <span>Reservations</span></a>
                  </li>
                  <li>
                     <a href="fees.html"><i class="fas fa-comment-dollar"></i> <span>Bookings</span></a>

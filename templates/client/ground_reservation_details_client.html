@@ -1,0 +1,91 @@
+{% extends 'client/clientbase.html' %}
+{% block title %}Reservations for {{ ground.ground_name }}{% endblock title %}
+{% block maincontent %}
+<div class="content container-fluid ml-5 mr-5">
+    <div class="container mt-5 mb-5">
+        <div class="row align-items-center">
+            <div class="col-lg-3">
+                <div class="form_area">
+                    <h3 class="selectdate">Select your date</h3>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="search_wrap">
+                    <form method="get" class="search_form" action="{% url 'select_date_and_reservations_client' ground_id=ground.id %}">
+                        <div class="input-group">
+                            <input type="date" class="form-control form-control-xl" name="selected_date" value="{{ selected_date }}" placeholder="Select a date">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary btn-xl ml-2" type="submit">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if reservations %}
+<div class="content container-fluid">
+    <div class="page-header">
+       <div class="row align-items-center">
+          <div class="col">
+             <h3 class="page-title">Reservations</h3>
+             
+          </div>
+       </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card card-table">
+             <div class="card-body">
+                <div class="table-responsive">
+                   <table class="table table-hover table-center mb-0 datatable">
+                      <thead>
+                         <tr>
+                            <th>ID</th>
+                            <th>Customer Name</th>
+                            <th>Reserved Date</th>
+                            <th>Reserved Timeslot</th>
+                            <th>Actions</th>
+                           
+                         </tr>
+                      </thead>
+                        <tbody>
+                        {% for reservation in reservations %}   
+                         <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ reservation.customer.admin.username }} </td>
+                            <td>{{ selected_date }}</td>
+                            <td>{{ reservation.time_slot }}</td>
+                           
+                            
+                          
+                            
+
+                            <td class="text-right">
+                               <div class="actions">
+                                  
+                                  <a href="#" class="btn btn-sm bg-danger-light">
+                                  <i class="fas fa-trash"></i>
+                                  </a>
+                               </div>
+                            </td>
+                         </tr>
+                         {% endfor %}
+                        </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+ {% else %}
+  <p>No reservations found for the selected date and ground.</p>
+{% endif %}
+
+{% endblock maincontent %}
+
+
+

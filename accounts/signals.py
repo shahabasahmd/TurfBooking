@@ -3,11 +3,14 @@ from django.dispatch import receiver
 from .models import CustomUser, Customers
 from django.conf import settings
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_customer(sender, instance, created, **kwargs):
-    if created:
-        Customers.objects.create(user=instance)
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def save_customer(sender, instance, **kwargs):
-    instance.customer.save()
+# @receiver(post_save, sender=CustomUser)
+# def save_customer(sender, instance, **kwargs):
+#     # Check if the user has a related customer instance
+#     try:
+#         customer = instance.customer
+#     except Customers.DoesNotExist:
+#         # If the customer does not exist, create a new one
+#         customer = Customers.objects.create(user=instance)
+#     # Update any relevant fields in the customer model based on the user data
+#     customer.save()

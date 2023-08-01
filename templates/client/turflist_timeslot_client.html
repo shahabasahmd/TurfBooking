@@ -4,7 +4,7 @@
 <div class="row">
     {% for turf in turfs %}
     <div class="col-xl-4 col-sm-6 col-12">
-        <a href="{% url 'timeslot_list_client' turf.id  %}">
+        <a href="{% url 'groundlist_timeslot_client' turf_id=turf.id %}">
             <div class="card flex-fill twitter sm-box">
                 <h6 class="text-capitalize">{{turf.turf_name }}</h6>
                 <p>Uploaded By: {{ turf.added_by.username }}</p>

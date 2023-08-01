@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    
 ]
 
 MIDDLEWARE = [
@@ -139,3 +140,5 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+

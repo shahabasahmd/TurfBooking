@@ -2,70 +2,126 @@
 {% block tile %}Lsit Turf Details{% endblock tile %}
 {% block maincontent %}
 
-
-
-
 <div class="content container-fluid">
-    <div class="page-header">
-       <div class="row align-items-center">
-          <div class="col">
-             <h3 class="page-title">Add Time Slot Details</h3>
-             <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Timeslot</a></li>
-                <li class="breadcrumb-item active">Add Time Slot Details</li>
-             </ul>
-          </div>
-       </div>
-    </div>
-    <div class="row">
-       <div class="col-sm-12">
-          <div class="card">
-             <div class="card-body">
-               <form method="post" action="{% url 'timeslot_page_client' %}" >
-                  {% csrf_token %}
-                  <div class="row">
-                      
-                      {% include 'include/messeges.html' %}
+   <!-- Your existing form code -->
+   <form method="post" action="{% url 'add_time_slot_client' %}" >
+       {% csrf_token %}
+       <div class="row">
+           {% include 'include/messeges.html' %}
 
-                      <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                           <label>Turf Name</label>
-                           <select class="form-control" name="turf_name" required>
-                            <option > Choose one</option>
-                            {% for turf in user_turfs %}
-                                <option value="{{ turf.id }}">{{ turf.turf_name }}</option>
-                            {% endfor %}
-                           </select>
-                        </div>
-                     </div> 
-                     <div class="col-12 col-sm-6">
-                        <div class="form-group">
-                            <label  >Date</label>
-                            <input type="date" class="form-control"name="day" id="day" required>
-                        </div>
-                    </div> 
-                      <div class="col-12 col-sm-6">
-                          <div class="form-group">
-                              <label for="start_time">Start Time</label>
-                              <input type="time" name="start_time" id="start_time" class="form-control" required>
-                          </div>
-                      </div>
-                      <div class="col-12 col-sm-6">
-                          <div class="form-group">
-                              <label for="end_time" >End Time</label>
-                              <input type="time" name="end_time" id="end_time"  class="form-control" required>
-                          </div>
-                      </div>
-                       <div class="col-12">
-                          <input type="submit"  value="Add Timeslot"class="btn btn-primary">
-                      </div>
-                  </div>
-              </form>
-             </div>
+           <div class="col-12 col-sm-6">
+               <div class="form-group">
+                   <label>Turf Name</label>
+                   <select class="form-control" name="turf_name" id="turf_name" required>
+                    <option value="">Choose one</option>
+                    {% for turf in turfs %}
+                    <option value="{{ turf.id }}">{{ turf.turf_name }}</option>
+                    {% endfor %}
+                </select>
+               </div>
+           </div>
+
+           <!-- Add the following div to display the Ground Names dropdown -->
+           <div class="col-12 col-sm-6">
+               <div class="form-group">
+                   <label>Ground Name</label>
+                   <select class="form-control" name="ground_name" id="ground_name" required>
+                       <option value="">Choose a Turf first</option>
+                   </select>
+               </div>
+           </div>
+
+           <!-- Your other form fields here -->
+           <div class="col-12 col-sm-6">
+              <div class="form-group">
+                  <label>Date</label>
+                  <input type="date" class="form-control" name="day" id="day" required>
+              </div>
           </div>
+          <div class="col-12 col-sm-6">
+           <div class="form-group">
+               <label>Match Duration</label>
+               <select class="form-control" name="match_duration" id="match_duration" required>
+                   <option value="">Choose one</option>
+                   <option value="1">1 hour</option>
+                   <option value="1.5">1.5 hours</option>
+                   <option value="2">2 hours</option>
+               </select>
+           </div>
        </div>
-    </div>
- </div>
+
+          <div class="col-12 col-sm-6">
+              <div class="form-group">
+                  <label for="start_time">Start Time</label>
+                  <input type="time" name="start_time" id="start_time" class="form-control" required>
+              </div>
+          </div>
+
+          <div class="col-12 col-sm-6">
+              <div class="form-group">
+                  <label for="end_time">End Time</label>
+                  <input type="time" name="end_time" id="end_time" class="form-control" required>
+              </div>
+          </div>
+           <div class="col-12">
+               <button type="button" onclick="submitTimeSlotForm()" class="btn btn-primary">Add Time Slot</button>
+           </div>
+       </div>
+   </form>
+</div>
+
+<script>
+   // Fetch the CSRF token from the cookies
+   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+   document.getElementById('turf_name').addEventListener('change', function () {
+     const turfId = this.value;
+     const groundNameSelect = document.getElementById('ground_name');
+
+     // Send an AJAX request to get the Ground Names associated with the selected Turf
+     fetch(`/get-ground-names/${turfId}/`, {
+         method: 'GET',
+         headers: {
+             'Content-Type': 'application/json',
+             'X-CSRFToken': csrftoken,
+         },
+     })
+     .then((response) => response.json())
+     .then((data) => {
+         // Log the data to check if it contains the expected values
+         console.log(data);
+
+         // Update the Ground Name dropdown options
+         groundNameSelect.innerHTML = '';
+         if (data.grounds.length === 0) {
+             groundNameSelect.innerHTML = '<option value="">No Grounds available</option>';
+         } else {
+             data.grounds.forEach((ground) => {
+                 const option = document.createElement('option');
+                 option.value = ground.id;
+                 option.textContent = ground.ground_name;
+                 groundNameSelect.appendChild(option);
+             });
+         }
+     })
+     .catch((error) => {
+         console.error('Error fetching Ground Names:', error);
+     });
+ });
+
+ function submitTimeSlotForm() {
+  // Get the form element
+  const form = document.querySelector('form');
+
+  // Submit the form
+  form.submit();
+}
+
+   
+
+   
+</script>
+
+
 
 
 {% endblock maincontent %}

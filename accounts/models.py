@@ -9,6 +9,7 @@ from django.utils.timezone import datetime
 class CustomUser(AbstractUser):
     user_type_data=((1,"ADMIN"),(2,"CLIENT"),(3,"USER"))
     user_type=models.CharField(default=1,choices=user_type_data,max_length=10)
+    is_blocked = models.BooleanField(default=False)
 
 class MainAdmin(models.Model):
     id=models.AutoField(primary_key=True)
@@ -25,6 +26,7 @@ class Clients(models.Model):
     address=models.TextField()
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now_add=True)
+    
     objects=models.Manager()
     def __str__(self):
         return f"Client ID: {self.id}, Username: {self.admin.username if self.admin else None}"
@@ -118,11 +120,8 @@ class Reservation(models.Model):
     customer = models.ForeignKey(Customers, on_delete=models.CASCADE)
     ground = models.ForeignKey(Ground, on_delete=models.CASCADE)
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
+    
     reservation_date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.customer.user.username} - {self.turf.name} - {self.reservation_date}"
-
-
-
-

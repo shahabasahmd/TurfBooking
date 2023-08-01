@@ -2,29 +2,86 @@
 {% load static %}
 {% block title %}Turf slot details{% endblock title %}
 {% block maincontent %}
-<h1>Reservation Details for {{ selected_date  }}</h1>
-{% if customer_reservations %}
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Turf Name</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reservation in customer_reservations %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ reservation.turf }}</td>
-                    <td>{{ reservation.time_slot.start_time|time:"H:i" }}</td> {# Display time only #}
-                    <td>{{ reservation.time_slot.end_time|time:"H:i" }}</td> {# Display time only #}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No reservations found for the selected date.</p>
-{% endif %}
+{% comment %} <h2>Your Reservations</h2>
+  {% for reservation in reservation_details_list %}
+    <div class="reservation-details">
+      <p>Turf: {{ reservation.turf_name }}</p>
+      <p>Ground: {{ reservation.ground_name }}</p>
+      <p>Time Slot: {{ reservation.time_slot }}</p>
+      <p>Reserved Date: {{ reservation.reserved_date }}</p>
+    </div>
+    <hr>
+
+
+    
+  {% endfor %} {% endcomment %}
+
+  <div class="row mt-4">
+    <div class="col-lg-10 offset-lg-1">
+        <div class="card card-table">
+            <div class="card-header">
+                <h3>Available Time Slots for Turf on {{ selected_date }}</h3>
+                <h4>Time Slot Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <div class="container">
+                        <form method="post" action="#">
+                            {% csrf_token %}
+                            <table class="table table-hover table-center mb-0 datatable" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Turf</th>
+                                        <th>Ground Name</th>
+                                        <th>Time slot</th>
+                                        <th>Booked Date</th>
+                                        <th>Amount Per Slot </th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                  {% if reservation_details_list %}
+                                  {% for reservation in reservation_details_list %}
+<tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ reservation.turf_name }}</td>
+    <td>{{ reservation.ground_name }}</td>
+    <td>{{ reservation.time_slot }}</td>
+    <td>{{ reservation.reserved_date }}</td>
+    <td>{{ reservation.ground_price }}</td> 
+                                        <td class="text-right">
+                                            <div class="actions">
+                                                <div class="form-check">
+                                                    <input type="hidden" class="form-control form-control-xl" name="selected_date" value="{{ selected_date }}" placeholder="Select a date">
+                                                    <input type="hidden" name="ground_id" value="{{ ground.id }}">
+                                                    <input type="checkbox" class="form-check-input" id="deleteCheckbox{{ timeslot.id }}" name="delete_checkbox" value="{{ timeslot.id }}">
+
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td colspan="3"></td>
+                                        <td class="text-right">
+                                            <button class="btn btn-primary btn-lg" type="submit">Book</button>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4">No Timeslot details found</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock maincontent  %} 

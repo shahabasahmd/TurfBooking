@@ -95,6 +95,36 @@ def delete_client(request, id):
     messages.success(request, "Selected client deleted successfully")
     return redirect('adminhome')
 
+def block_client(request, user_id):
+    client = get_object_or_404(CustomUser, id=user_id)
+
+    # Set is_blocked to True
+    client.is_blocked = True
+    client.save()
+
+    # Add a custom message when blocking the client
+    messages.success(request, f"{client.username} has been blocked.")
+
+    return redirect('adminhome')
+
+
+def unblock_client(request, user_id):
+    client = get_object_or_404(CustomUser, id=user_id)
+    client.is_blocked = False
+    client.save()
+    messages.success(request, f"{client.username} has been unblocked.")
+    return redirect('adminhome')
+
+    
+def blocked_clients(request):
+    blocked_clients = CustomUser.objects.filter(is_blocked=True)
+    context = {
+        'blocked_clients': blocked_clients
+    }
+    return render(request, 'admin/blocked_clients.html', context)
+
+
+
 def add_turf(request):
     return render(request,'admin/addturf.html')   
 
@@ -268,43 +298,41 @@ def timeslot_list(request, ground_id):
     return render(request, 'admin/list_timeslot_admin.html', {'ground': ground, 'timeslots': timeslots})
 
 
+def delete_timeslot_admin(request, timeslot_id):
+    timeslot = get_object_or_404(TimeSlot, pk=timeslot_id)
+    ground_id = timeslot.ground.id  # Assuming Timeslot model has a foreign key to the Ground model
+
+    if request.method == 'POST':
+        timeslot.delete()
+        return redirect('timeslot_list_admin', ground_id=ground_id)
+    
+    return render(request, 'admin/list_timeslot_admin.html', {'timeslot': timeslot})
 
 
 @login_required
-def delete_timeslot(request, timeslot_id):
-    try:
-        timeslot = TimeSlot.objects.get(id=timeslot_id)
-        if request.user == timeslot.added_by:
-            timeslot.delete()
-        else:
-            # Redirect with a message indicating permission error
-            return redirect('success_page')
-    except TimeSlot.DoesNotExist:
-        # Redirect with a message indicating timeslot not found
-        return redirect('success_page')
+def turf_list_reservation(request):
+    t = TurfDetails.objects.all()
+    return render(request, 'admin/turflist_reservation_admin.html', {'turfs': t})
 
-    return redirect('success_page')
-# @login_required
-# def timeslot_details_admin(request, turf_id):
-#     turf = get_object_or_404(TurfDetails, id=turf_id)
-#     timeslots = TimeSlot.objects.filter(turf_name=turf)
-#     return render(request, 'admin/list_timeslot_admin.html', {'turf': turf, 'timeslots': timeslots})
+@login_required
+def ground_list_reservation(request,turf_id):
+    turf = get_object_or_404(TurfDetails, id=turf_id)
+    grounds = Ground.objects.filter(turf=turf)
+    return render(request, 'admin/groundlist_reservation_admin.html', {'turf': turf, 'grounds': grounds})
 
 
+def select_date_and_reservations(request, ground_id):
+    selected_date = request.GET.get('selected_date')
 
-# @login_required
-# def delete_timeslot_admin(request, timeslot_id):
-#     timeslot = get_object_or_404(TimeSlot, pk=timeslot_id)
-#     timeslot.delete()
-#     messages.success(request, 'Timeslot deleted successfully')
-#     return redirect('timeslot_details_admin')
+    # Convert the selected_date to a Python datetime object if it exists
+    if selected_date:
+        selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
 
+    # Get the specific ground based on the ground_id
+    ground = get_object_or_404(Ground, id=ground_id)
 
+    # Filter reservations for the selected date and ground
+    reservations = Reservation.objects.filter(ground=ground, time_slot__date=selected_date) if selected_date else []
 
-# @login_required
-# def reservation_list(request):
-#     reservations = Reservation.objects.select_related('customer').all()
-#     context = {
-#         'reservations': reservations,
-#     }
-#     return render(request, 'admin/reservation_list_admin.html', context)
+    # Render the template with the necessary context
+    return render(request, 'admin/ground_reservation_details.html', {'ground': ground, 'selected_date': selected_date, 'reservations': reservations})
