@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accounts.middleware.BlockMiddleware',
 ]
 
 ROOT_URLCONF = 'turf.urls'
@@ -79,7 +80,7 @@ WSGI_APPLICATION = 'turf.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'turf',
+        'NAME': 'turfbooking',
         'USER':'root',
         'PASSWORD':'',
         'HOST':'localhost',
@@ -142,3 +143,5 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 
+RAZOR_KEY_ID = "rzp_test_mEBXoRn25vFX8a"
+RAZOR_KEY_SECRET = "iE5gWZq2PBfRChWw0GOJHZ5O"

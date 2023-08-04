@@ -128,6 +128,7 @@ def reserve_timeslots(request):
         # Convert the selected_date_str to the correct format (YYYY-MM-DD)
         selected_date = datetime.strptime(selected_date_str, '%b. %d, %Y').strftime('%Y-%m-%d')
 
+
         # Loop through the selected time slot IDs and create a Reservation object for each one
         for time_slot_id_str in delete_checkbox_values:
             try:
@@ -157,34 +158,96 @@ def reserve_timeslots(request):
             }
             reservation_details_list.append(reservation_details)
 
-        return render(request, 'user/reservation_details_user.html', {'reservation_details_list': reservation_details_list})
+        return redirect('success_page_user') 
     
-    return render(request, 'user/reservation_details_user.html')
-# def reservation_success_user(request):
-#     try:
-#         customer = Customers.objects.get(admin=request.user)
-#         reservations = Reservation.objects.filter(customer=customer)
-#     except Customers.DoesNotExist:
-#         return HttpResponse("You are not a registered customer.")
+    return render(request, 'user/list_timeslot_user.html')
 
-#     reservation_details_list = []
-#     for reservation in reservations:
-#         ground_name = reservation.ground.ground_name
-#         ground_price = reservation.ground.price
-#         turf_name = reservation.ground.turf.turf_name
-#         time_slot = f"{reservation.time_slot.start_time.strftime('%I:%M %p')} - {reservation.time_slot.end_time.strftime('%I:%M %p')}"
-#         reserved_date = reservation.reservation_date.strftime('%B %d, %Y')
 
-#         reservation_details_list.append({
-#             'turf_name': turf_name,
-#             'ground_name': ground_name,
-#             'ground_price': ground_price,
-#             'time_slot': time_slot,
-#             'reserved_date': reserved_date,
-#         })
+@login_required
+def reservation_success_user(request):
+    customer = Customers.objects.get(admin=request.user)
+    reservations = Reservation.objects.filter(customer=customer)
 
-#     # Print the details in the terminal
-#     for details in reservation_details_list:
-#         print(details)
+    reservation_details_list = []
+    total_amount = 0  # Initialize total_amount variable
 
-#     return render(request, 'user/reservation_details_user.html', {'reservation_details_list': reservation_details_list})
+    for reservation in reservations:
+        reservation_details = {
+            'id': reservation.id,
+            'turf_name': reservation.ground.turf.turf_name,
+            'ground_name': reservation.ground.ground_name,
+            'reserved_date': reservation.reservation_date.strftime('%B %d, %Y'),
+            'ground_price': reservation.ground.price,
+            'time_slot': f"{reservation.time_slot.start_time.strftime('%I:%M %p')} - {reservation.time_slot.end_time.strftime('%I:%M %p')}"
+        }
+        reservation_details_list.append(reservation_details)
+        
+        
+        if reservation_details['ground_price']:
+            total_amount += float(reservation_details['ground_price'])  # Calculate the total amount
+            razoramount=total_amount*100
+
+    context = {
+        'reservation_details_list': reservation_details_list,
+        'total_amount': total_amount , # Pass total_amount to the template
+        'razoramount' : razoramount,
+    }
+
+    return render(request, 'user/reservation_details_user.html', context)
+
+def delete_reservation(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id)
+
+    if request.method == 'POST':
+        reservation.delete()
+        # You can add a success message here if you want
+    return redirect('success_page_user')
+
+
+from django.views import View
+from django.http import JsonResponse
+class PaymentSuccessView(View):
+    def post(self, request, *args, **kwargs):
+        razorpay_payment_id = request.POST.get('razorpay_payment_id')
+        amount = request.POST.get('amount')
+       
+        customer_id = request.POST.get('customer_id')  
+        reservation_id = request.POST.get('reservation_id')
+       
+        customer = Customers.objects.get(id=customer_id)
+        reservation = Reservation.objects.get(id=reservation_id)
+        print("Payment Success!")
+        print("Razorpay Payment ID:", razorpay_payment_id)
+        print("Amount:", amount)
+        # Create and save a Payment instance
+        payment = Payment.objects.create(
+            customer=customer,
+            reservation=reservation,
+            razorpay_payment_id=razorpay_payment_id,
+            amount=amount,
+        )
+
+        return JsonResponse({'message': 'Payment details saved successfully.'})
+    
+def get_customer_for_user(user_id):
+    custom_user = get_object_or_404(CustomUser, id=user_id)
+    
+    # Assuming the ForeignKey is named 'customer'
+    customer = custom_user.customer
+    
+    return customer
+@login_required
+def booking_history(request):
+    # custom_user = request.user
+
+    # try:
+    #     customer = custom_user.customer
+    # except Customers.DoesNotExist:
+    #     customer = None
+
+    # if customer:
+    #     reservations = Reservation.objects.filter(customer=customer)
+    # else:
+    #     reservations = []
+
+    return render(request, 'user/booking_history.html')

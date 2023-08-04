@@ -202,6 +202,10 @@ def client_turf_list_timeslot(request):
     return render(request, 'client/timeslotpage_client.html', context)
 
   
+
+
+
+    
 @login_required
 def add_time_slot_client(request):
     if request.method == 'POST':
@@ -210,32 +214,41 @@ def add_time_slot_client(request):
         match_duration = float(request.POST.get('match_duration'))
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
+        date_from = datetime.strptime(request.POST.get('date_from'), '%Y-%m-%d')
+        date_to = datetime.strptime(request.POST.get('date_to'), '%Y-%m-%d')
 
         # Convert start_time and end_time to datetime objects
-        from datetime import datetime
         start_datetime = datetime.strptime(start_time, '%H:%M')
         end_datetime = datetime.strptime(end_time, '%H:%M')
 
         # Calculate the number of time slots to create
         time_slot_count = int((end_datetime - start_datetime).seconds / (match_duration * 3600))
 
-        # Save the time slots
-        for i in range(time_slot_count):
-            time_slot = TimeSlot.objects.create(
-                added_by=request.user,  # Add the added_by field here with the currently logged-in user
-                ground_id=ground_id,
-                date=request.POST.get('day'),
-                start_time=start_datetime.time(),
-                end_time=(start_datetime + timedelta(hours=match_duration)).time()
-            )
-            start_datetime += timedelta(hours=match_duration)
+        # Calculate the number of days in the date range
+        num_days = (date_to - date_from).days + 1
+        
+        # Save the time slots for each day within the date range
+        for _ in range(num_days):
+            current_datetime = start_datetime  # Reset for each new day
+            for i in range(time_slot_count):
+                TimeSlot.objects.create(
+                    added_by=request.user,
+                    ground_id=ground_id,
+                    date=date_from.date(),
+                    start_time=current_datetime.time(),
+                    end_time=(current_datetime + timedelta(hours=match_duration)).time()
+                )
+                current_datetime += timedelta(hours=match_duration)
+                
+            # Move to the next day and reset start_datetime
+            date_from += timedelta(days=1)
+            start_datetime = datetime.strptime(start_time, '%H:%M')
 
         # Redirect to a success page after successful data submission
         return redirect('success_page')
 
     # If the request method is GET, render the form page
     return render(request, 'client/timeslotpage_client.html', context={})
-
 
 @login_required
 def turf_list_timeslot(request):

@@ -101,12 +101,10 @@ urlpatterns = [
     path('reserve-timeslots/', users_views.reserve_timeslots, name='reserve_timeslots'),
 
     # path('reserve_timeslots/', users_views.reserve_timeslots, name='reserve_timeslots'),
-    # path('reservation-success-user/', users_views.reservation_success_user, name='success_page_user'),
-    
-    
-    
-    
-
+    path('reservation-success-user/', users_views.reservation_success_user, name='success_page_user'),
+    path('delete-reservation/<int:reservation_id>/', users_views.delete_reservation, name='delete_reservation'),
+    # path('save-payment/', users_views.save_payment, name='save_payment'),
+    path('payment-success/', users_views.PaymentSuccessView.as_view(), name='payment_success'),
     
    
     

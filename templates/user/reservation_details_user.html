@@ -2,31 +2,17 @@
 {% load static %}
 {% block title %}Turf slot details{% endblock title %}
 {% block maincontent %}
-{% comment %} <h2>Your Reservations</h2>
-  {% for reservation in reservation_details_list %}
-    <div class="reservation-details">
-      <p>Turf: {{ reservation.turf_name }}</p>
-      <p>Ground: {{ reservation.ground_name }}</p>
-      <p>Time Slot: {{ reservation.time_slot }}</p>
-      <p>Reserved Date: {{ reservation.reserved_date }}</p>
-    </div>
-    <hr>
 
-
-    
-  {% endfor %} {% endcomment %}
-
-  <div class="row mt-4">
+<div class="row mt-4">
     <div class="col-lg-10 offset-lg-1">
         <div class="card card-table">
             <div class="card-header">
-                <h3>Available Time Slots for Turf on {{ selected_date }}</h3>
-                <h4>Time Slot Details</h4>
+                <h3>Reservation Details</h3>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <div class="container">
-                        <form method="post" action="#">
+                        <form method="post" id="myform">
                             {% csrf_token %}
                             <table class="table table-hover table-center mb-0 datatable" style="width: 100%;">
                                 <thead>
@@ -36,41 +22,44 @@
                                         <th>Ground Name</th>
                                         <th>Time slot</th>
                                         <th>Booked Date</th>
-                                        <th>Amount Per Slot </th>
+                                        <th>Amount Per Slot</th>
                                         <th class="text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                  {% if reservation_details_list %}
-                                  {% for reservation in reservation_details_list %}
-<tr>
-    <td>{{ forloop.counter }}</td>
-    <td>{{ reservation.turf_name }}</td>
-    <td>{{ reservation.ground_name }}</td>
-    <td>{{ reservation.time_slot }}</td>
-    <td>{{ reservation.reserved_date }}</td>
-    <td>{{ reservation.ground_price }}</td> 
+                                    {% if reservation_details_list %}
+                                    {% for reservation in reservation_details_list %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ reservation.turf_name }}</td>
+                                        <td>{{ reservation.ground_name }}</td>
+                                        <td>{{ reservation.time_slot }}</td>
+                                        <td>{{ reservation.reserved_date }}</td>
+                                        <td class="font-weight-bold text-danger font-italic fs-5" >{{ reservation.ground_price }}</td>
                                         <td class="text-right">
-                                            <div class="actions">
-                                                <div class="form-check">
-                                                    <input type="hidden" class="form-control form-control-xl" name="selected_date" value="{{ selected_date }}" placeholder="Select a date">
-                                                    <input type="hidden" name="ground_id" value="{{ ground.id }}">
-                                                    <input type="checkbox" class="form-check-input" id="deleteCheckbox{{ timeslot.id }}" name="delete_checkbox" value="{{ timeslot.id }}">
-
-                                                </div>
-                                            </div>
-                                        </td>
+                                          <div class="actions">
+                                             
+                                            <form method="post" action="{% url 'delete_reservation' reservation.id %}" onsubmit="calculateTotalAmount()">
+                                              {% csrf_token %}
+                                              <button type="submit" class="btn btn-sm bg-danger-light">
+                                                  <i class="fas fa-trash"></i>
+                                              </button>
+                                          </form>
+                                          </div>
+                                       </td>
                                     </tr>
                                     {% endfor %}
                                     <tr>
-                                        <td colspan="3"></td>
+                                        <td colspan="6"></td>
                                         <td class="text-right">
-                                            <button class="btn btn-primary btn-lg" type="submit">Book</button>
+                                          <input type="hidden" id="total-amount" name="total-amount" value="{{ total_amount }}">
+                                          
+                                          <button id="rzp-button1" class="btn btn-warning mt-3 p-3 px-5 fw-bold" type="button">Make Payment </button>
                                         </td>
                                     </tr>
                                     {% else %}
                                     <tr>
-                                        <td colspan="4">No Timeslot details found</td>
+                                        <td colspan="7">No Timeslot details found</td>
                                     </tr>
                                     {% endif %}
                                 </tbody>
@@ -83,5 +72,76 @@
     </div>
 </div>
 
+<!-- Display the total amount -->
+<div class="total-amount">Total Amount: ${{ total_amount }}</div>
 
-{% endblock maincontent  %} 
+
+
+{% endblock maincontent %}
+{% block payment-gateway %} 
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+
+
+
+    var options = {
+    "key": "rzp_test_mEBXoRn25vFX8a", // Enter the Key ID generated from the Dashboard
+    "amount": "{{ razoramount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "{{request.user}}",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": "", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    // "custId = parseInt(form.elements['custid'].value)",
+    "handler": function (response){
+        var form = document.getElementById("myform")
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_order_id);
+        // alert(response.razorpay_signature)
+        // window.location.href='http://localhost:8000/paymentdone?order_id=${response.razorpay_orderid}&payment_id=${respose.razorpay_payment_id}&cust_id=${form.elements["custid"].value}'
+        window.location.href = '#';
+
+    },
+    
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+
+
+var rzp1 = new Razorpay(options);
+    rzp1.on('payment.success', function(response) {
+        var paymentData = {
+            razorpay_payment_id: response.razorpay_payment_id,
+            amount: "{{ razoramount }}"
+            // Add more data fields as needed
+        };
+        
+        $.ajax({
+            type: "POST",
+            url: "{% url 'payment_success' %}",  // Change this URL to the appropriate view
+            data: paymentData,
+            dataType: "json",
+            success: function(response) {
+                // Handle success response
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+            }
+        });
+        
+        // Redirect to success page or perform other actions
+        window.location.href = '#';
+    });
+
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>
+
+   
+
+{% endblock payment-gateway %}
+

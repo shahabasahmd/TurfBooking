@@ -125,3 +125,11 @@ class Reservation(models.Model):
 
     def __str__(self):
         return f"{self.customer.user.username} - {self.turf.name} - {self.reservation_date}"
+    
+
+class Payment(models.Model):
+    customer = models.ForeignKey(Customers, on_delete=models.CASCADE)
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
+    razorpay_payment_id = models.CharField(max_length=100,null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)

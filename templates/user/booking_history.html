@@ -1,0 +1,26 @@
+{% extends 'user/user_basefile.html' %}
+{% block title %}Booking History{% endblock title %}
+{% block maincontent %}
+    <h3>Booking History</h3>
+    <h4>Reservations</h4>
+    <ul>
+        {% for reservation in reservations %}
+            <li>
+                {{ reservation.ground_name }} - {{ reservation.reservation_date }}
+            </li>
+        {% empty %}
+            <li>No reservations found.</li>
+        {% endfor %}
+    </ul>
+
+    <h4>Payments</h4>
+    <ul>
+        {% for payment in payments %}
+            <li>
+                Amount: ${{ payment.amount }} - Date: {{ payment.timestamp }}
+            </li>
+        {% empty %}
+            <li>No payments found.</li>
+        {% endfor %}
+    </ul>
+{% endblock maincontent %}
