@@ -70,17 +70,18 @@
   padding: 14px 54px 15px;
 }
 
+
 .u-section-1 .u-image-2 {
   min-height: 570px;
-  background-image: url("/static/images/5567230.jpg");
-  background-position: 50% 50%;
+  background-image: url("/static/images/football-turf.png");
+  background-position: center;
+  background-size: cover;
   --animation-custom_in-translate_x: 300px;
   --animation-custom_in-translate_y: 0px;
   --animation-custom_in-opacity: 0;
   --animation-custom_in-rotate: 0deg;
   --animation-custom_in-scale: 1;
 }
-
 .u-section-1 .u-container-layout-2 {
   padding: 30px;
 }

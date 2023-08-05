@@ -1,128 +1,102 @@
-
 {% extends 'user/user_basefile.html' %}
-
 {% block tile %}Turf details{% endblock tile %}
-
-
 {% block maincontent %}
 
-<section class="u-clearfix u-image u-valign-top-lg u-section-1" id="carousel_7ad0" data-image-width="1920" data-image-height="1200" data-animation-name="" data-animation-duration="0" data-animation-delay="0" data-animation-direction="">
-  <div class="u-clearfix u-gutter-20 u-layout-wrap u-layout-wrap-1">
-    <div class="u-layout">
-      <div class="u-layout-row">
-        <div class="u-align-left u-container-style u-layout-cell u-left-cell u-size-20-lg u-size-20-xl u-size-60-md u-size-60-sm u-size-60-xs u-layout-cell-1" data-animation-name="customAnimationIn" data-animation-duration="1500" data-animation-delay="500">
-          <div class="u-container-layout u-container-layout-1">
-            <img class="u-image u-image-circle u-image-contain u-preserve-proportions u-image-1" src="" alt="" data-image-width="113" data-image-height="112">
-            <h1 class="u-align-center u-custom-font u-text u-text-1" data-animation-name="customAnimationIn" data-animation-duration="1500">{{turf.turf_name}} </h1>
-            <p class="u-align-center u-text u-text-2" data-animation-name="customAnimationIn" data-animation-duration="1500" data-animation-delay="750"> {{turf.place}}.<br>
-              <br>
-            </p>
-            
-          </div>
-          <section class="u-align-center u-clearfix u-section-3" id="carousel_b856">
-            <div class="u-align-center u-container-style  u-group u-radius-20 u-shape-round u-group-1" data-animation-name="customAnimationIn" data-animation-duration="1500">
-              <div class="u-container-layout u-valign-middle u-container-layout-1">
-                <h1 class="u-custom-font u-font-source-sans-pro u-text u-text-default u-text-1"> Turn up the heat on your goals!</h1>
-                <p class="u-text u-text-2">
-                  <li>Cafe: {% if turf.cafe %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>First Aid: {% if turf.first_aid %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>Locker: {% if turf.locker %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>Parking: {% if turf.parking %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>Shower: {% if turf.shower %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-              </p>
-                
-              </div>
+<!-- About Start -->
+<div class="container-xxl py-5">
+<div class="container">
+   <div class="row g-5 align-items-center">
+      <div class="col-lg-6">
+         <h6 class="section-title text-start text-primary text-uppercase">About Us</h6>
+         <h1 class="mb-4">Welcome to <span class="text-primary text-uppercase">{{turf.turf_name}}</span></h1>
+         <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet</p>
+      </div>
+      <div class="col-lg-6">
+         <div class="row g-3">
+            <h3 class="mb-4"> <span class="text-primary text-uppercase">Aminities Provided</span></h3>
+            {% if turf.first_aid %}  
+            <div class="row g-3 pb-4">
+               <div class="col-sm-4 wow fadeIn" data-wow-delay="0.1s">
+                  <div class="border rounded p-1">
+                     <div class="border rounded text-center p-4">
+                        <i class="fa fa-hospital fa-2x text-primary mb-2"></i>
+                        <h2 class="mb-1" data-toggle="counter-up"></h2>
+                        <p class="mb-0">First Aid Kit</p>
+                     </div>
+                  </div>
+               </div>
+               {% endif %}
+               {% if turf.cafe %}
+               <div class="col-sm-4 wow fadeIn" data-wow-delay="0.3s">
+                  <div class="border rounded p-1">
+                     <div class="border rounded text-center p-4">
+                        <i class="fa fa-utensils fa-2x text-primary mb-2"></i>
+                        <h2 class="mb-1" data-toggle="counter-up"></h2>
+                        <p class="mb-0">Cafe</p>
+                     </div>
+                  </div>
+               </div>
+               {% endif %}
+               {% if turf.locker %}
+               <div class="col-sm-4 wow fadeIn" data-wow-delay="0.5s">
+                  <div class="border rounded p-1">
+                     <div class="border rounded text-center p-4">
+                        <i class="fa fa-lock fa-2x text-primary mb-2"></i>
+                        <p class="mb-0">Locker Facility</p>
+                     </div>
+                  </div>
+               </div>
+               {% endif %}
+               {% if turf.parking %}
+               <div class="col-sm-4 wow fadeIn" data-wow-delay="0.5s">
+                  <div class="border rounded p-1">
+                     <div class="border rounded text-center p-4">
+                        <i class="fa fa-parking fa-2x text-primary mb-2"></i>
+                        <p class="mb-0">Parking Facility</p>
+                     </div>
+                  </div>
+               </div>
+               {% endif %}
+               {% if turf.shower %}
+               <div class="col-sm-4 wow fadeIn" data-wow-delay="0.5s">
+                  <div class="border rounded p-1">
+                     <div class="border rounded text-center p-4">
+                        <i class="fa fa-shower fa-2x text-primary mb-2"></i>
+                        <p class="mb-0">Shower Facility</p>
+                     </div>
+                  </div>
+               </div>
+               {% endif %}
             </div>
-          </section>
-        </div>
-
-        
-
-      
-        
-    
+         </div>
       </div>
-    </div>
-  </div>
-</section>
-<div class="row row-cols-1 row-cols-md-3 g-4 py-5">
-  {% for ground in grounds %}
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <h3 class="card-title">{{ ground.ground_name }}</h3>
-          <p class="card-text">Price: {{ ground.price }}</p>
-          <!-- Add more ground details as needed -->
-
-          <a href="{% url 'available_time_slots' ground_id=ground.id %}" class="btn btn-primary">View Available Time Slots</a>
-        </div>
-      </div>
-    </div>
-  {% endfor %}
-</div>
+   </div>
 </div>
 
-
-
- <!-- <div class = "card-wrapper mt-5" style="margin-top: 20px;">
-    <div class = "card">
       
-      <div class="product-imgs">
-        <div class="img-display">
-          <div class="img-showcase">
-            <img style="width: 500px;height: 300px;" src="{{ turf.image.url }}" alt="" >
-          </div>
-        </div>
-      </div>
-     
-      <div class = "product-content">
-        <h2 class = "product-title">{{turf.turf_name}}</h2>
-        <div class="spacer" ></div>
-        
-        
+      
 
-        <div class = "product-price">
-          
-          <p class = "new-price">Price: <span>₹ {{turf.price}}</span></p>
-        </div>
+        <!-- Service Start -->
+        <div class="container-xxl py-5">
+          <div class="container">
+              <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                  <h6 class="section-title text-center text-primary text-uppercase">Our Services</h6>
+                  <h1 class="mb-5">Explore Our <span class="text-primary text-uppercase">Grounds</span></h1>
+              </div>
+              <div class="row g-4">
+                {% for ground in grounds %}
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+    <div class="service-item rounded position-relative border border-dark shadow" href="">
+        <span class="position-absolute top-0 end-0 badge bg-danger fw-bold fs-5">{{ ground.price }} / - Per Hour</span>
+        <h3 class="mb-3 text-capitalize">{{ ground.ground_name }}</h3>
+        <a class="btn btn-sm btn-primary rounded py-2 px-4" href="{% url 'available_time_slots' ground_id=ground.id %}"> Book Now </a>
+    </div>
+</div>
 
-        <div class = "product-detail">
-          <h3>Place : {{turf.place}} </h3>
-         
-          <ul>
-            <li>phone: <span class="text-danger">{{turf.phone}}</span></li>
-            {% if turf %}
+                {% endfor %}
+            </div>
             
-            <p>Category: {{ turf.get_category_display }}</p>
-            <ul>
-                <li>Category: Fives {% if turf.category == 'fives' %}<span style="font-size: 20px;">&#9989;</span>
-                 {% elif turf.category == 'sevens'  %} Sevens : <span style="font-size: 20px;">&#9989;</span>
-                   {% elif turf.category == 'elevens' %}Elevens :<span style="font-size: 20px;">&#9989;</span>
-                  {% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>Cafe: {% if turf.cafe %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>First Aid: {% if turf.first_aid %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>Locker: {% if turf.locker %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>Parking: {% if turf.parking %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-                  <li>Shower: {% if turf.shower %}<span style="font-size: 20px;">&#9989;</span>{% else %}<span style="font-size: 22px;">&#9744;</span>{% endif %}</li>
-      
-        {% endif %}
-        
-          </ul>
-        </div>
-        <div class="btn-groups">
-          <a href="#" style="display: inline-block; font-size: 16px; font-family: inherit; text-transform: uppercase; padding: 15px 16px; color:darkblue; cursor: pointer; transition: all 0.3s ease; background-color: #FF9F00; border: 2px solid #FF9F00; border-radius: 10px; margin-right: 50px;" class="add-cart-btn">
-            <i style="margin-right: 8px;" class="fas fa-shopping-cart"></i>SHOW AVAILABLE SLOTS</a>
-          
-        </div>
-        
-        
-        
+          </div>
       </div>
-    </div>
-  </div>
-</div> -->
-
-
-
-
+      <!-- Service End -->
 {% endblock maincontent  %}
