@@ -5,6 +5,7 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
+
 :root {
     --primary: #FEA116;
     --light: #F1F8FF;
@@ -242,3 +243,4 @@ body {
     background-color: #ffc107 !important; /* Yellow - Warning color */
     border-color:black !important; /* Border color for the button on hover */
 }
+

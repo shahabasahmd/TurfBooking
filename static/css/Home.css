@@ -73,14 +73,15 @@
 .u-section-1 .u-image-2 {
   min-height: 570px;
   background-image: url("/static/images/football-turf.png");
-  background-position: center;
-  background-size: cover;
+  
+  background-size: contain;
   --animation-custom_in-translate_x: 300px;
   --animation-custom_in-translate_y: 0px;
   --animation-custom_in-opacity: 0;
   --animation-custom_in-rotate: 0deg;
   --animation-custom_in-scale: 1;
 }
+
 .u-section-1 .u-container-layout-2 {
   padding: 30px;
 }

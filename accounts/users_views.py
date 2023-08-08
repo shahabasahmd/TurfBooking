@@ -67,6 +67,10 @@ def add_user_save(request):
 def turf_list(request):
     turfs = TurfDetails.objects.all()
     return render(request, 'user/turf_list.html', {'turfs': turfs})
+def get_places(request):
+    search_query = request.GET.get('q', '')
+    places = TurfDetails.objects.filter(place__icontains=search_query).values_list('place', flat=True).distinct()
+    return JsonResponse(list(places), safe=False)
    
 
 def turf_details_user(request, turf_id):
@@ -163,13 +167,23 @@ def reserve_timeslots(request):
     return render(request, 'user/list_timeslot_user.html')
 
 
+def delete_reservation(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id)
+
+    if request.method == 'POST':
+        reservation.delete()
+        # You can add a success message here if you want
+    return redirect('success_page_user')
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 @login_required
 def reservation_success_user(request):
     customer = Customers.objects.get(admin=request.user)
     reservations = Reservation.objects.filter(customer=customer)
 
     reservation_details_list = []
-    total_amount = 0  # Initialize total_amount variable
+    total_amount = 0
 
     for reservation in reservations:
         reservation_details = {
@@ -181,73 +195,96 @@ def reservation_success_user(request):
             'time_slot': f"{reservation.time_slot.start_time.strftime('%I:%M %p')} - {reservation.time_slot.end_time.strftime('%I:%M %p')}"
         }
         reservation_details_list.append(reservation_details)
-        
-        
+
         if reservation_details['ground_price']:
-            total_amount += float(reservation_details['ground_price'])  # Calculate the total amount
-            razoramount=total_amount*100
+            total_amount += float(reservation_details['ground_price'])
+            razoramount = total_amount * 100
 
     context = {
         'reservation_details_list': reservation_details_list,
-        'total_amount': total_amount , # Pass total_amount to the template
-        'razoramount' : razoramount,
+        'total_amount': total_amount,
+        'razoramount': razoramount,
     }
 
     return render(request, 'user/reservation_details_user.html', context)
 
-def delete_reservation(request, reservation_id):
-    reservation = get_object_or_404(Reservation, id=reservation_id)
-
+@csrf_exempt
+def save_payment(request):
     if request.method == 'POST':
-        reservation.delete()
-        # You can add a success message here if you want
-    return redirect('success_page_user')
-
-
-from django.views import View
-from django.http import JsonResponse
-class PaymentSuccessView(View):
-    def post(self, request, *args, **kwargs):
         razorpay_payment_id = request.POST.get('razorpay_payment_id')
         amount = request.POST.get('amount')
-       
-        customer_id = request.POST.get('customer_id')  
         reservation_id = request.POST.get('reservation_id')
-       
-        customer = Customers.objects.get(id=customer_id)
-        reservation = Reservation.objects.get(id=reservation_id)
-        print("Payment Success!")
-        print("Razorpay Payment ID:", razorpay_payment_id)
-        print("Amount:", amount)
-        # Create and save a Payment instance
-        payment = Payment.objects.create(
-            customer=customer,
-            reservation=reservation,
-            razorpay_payment_id=razorpay_payment_id,
-            amount=amount,
-        )
 
-        return JsonResponse({'message': 'Payment details saved successfully.'})
+        if razorpay_payment_id and amount and reservation_id:
+            try:
+                reservation = Reservation.objects.get(id=reservation_id)
+            except Reservation.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Reservation not found'})
+
+            customer = request.user.customer
+
+            payment = Payment.objects.create(
+                customer=customer,
+                reservation=reservation,
+                razorpay_payment_id=razorpay_payment_id,
+                amount=amount
+            )
+
+            return JsonResponse({'status': 'success'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Payment ID, amount, or Reservation ID missing'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+def payment_done(request):
+    if request.method == 'GET':
+        payment_id = request.GET.get('payment_id')
+        reservation_id = request.GET.get('reservation_id')
+
+        if not payment_id:
+            return JsonResponse({'status': 'error', 'message': 'Payment ID is missing'})
+
+        if not reservation_id:
+            return JsonResponse({'status': 'error', 'message': 'Reservation ID is missing'})
+
+        try:
+            reservation = Reservation.objects.get(id=reservation_id)
     
-def get_customer_for_user(user_id):
-    custom_user = get_object_or_404(CustomUser, id=user_id)
+    # Assuming you have a ForeignKey or OneToOneField relationship between CustomUser and Customers
+            customer = Customers.objects.get(admin=request.user) # Modify 'customuser' if it's named differently
     
-    # Assuming the ForeignKey is named 'customer'
-    customer = custom_user.customer
-    
-    return customer
+            amount = reservation.ground.price
+
+            payment = Payment.objects.create(
+                customer=customer,
+                reservation=reservation,
+                razorpay_payment_id=payment_id,
+                amount=amount
+            )
+
+            print("Payment Details Saved Successfully")
+            return redirect('booking_history')  # Redirect to the desired page
+        except Exception as e:
+            print("Error:", e)
+            return JsonResponse({'status': 'error', 'message': 'An error occurred while saving payment details'})
+
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
 @login_required
 def booking_history(request):
-    # custom_user = request.user
+    try:
+        customer = Customers.objects.get(admin=request.user) 
+    except Customers.DoesNotExist:
+        customer = None
 
-    # try:
-    #     customer = custom_user.customer
-    # except Customers.DoesNotExist:
-    #     customer = None
+    if customer:
+        bookings = Reservation.objects.filter(customer=customer)
+    else:
+        bookings = []
 
-    # if customer:
-    #     reservations = Reservation.objects.filter(customer=customer)
-    # else:
-    #     reservations = []
+    context = {
+        'bookings': bookings
+    }
 
-    return render(request, 'user/booking_history.html')
+    return render(request, 'user/booking_history.html', context)

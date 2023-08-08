@@ -33,7 +33,7 @@
                                     <th>Email</th>
                                     <th>Mobile Number</th>
                                     <th>Address</th>
-                                    <th>Actions</th>
+                                    <th>Delete / Block</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -54,9 +54,16 @@
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                             
-                                            <a href="{% url 'block_client' i.admin.id %}" class="btn btn-sm bg-success-light">
+                                            {% if i.admin.is_blocked %}
+                                            <a href="{% url 'unblock_client' i.admin.id %}" class="btn btn-sm bg-success  text-white">
+                                                Unblock
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'block_client' i.admin.id %}" class="btn btn-sm bg-danger text-white">
                                                 Block
                                             </a>
+                                        {% endif %}
+
        
         
     

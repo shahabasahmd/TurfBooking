@@ -1,19 +1,24 @@
 {% extends 'user/user_basefile.html' %}
 {% block tile %}Turf details{% endblock tile %}
 {% block maincontent %}
-
 <!-- About Start -->
+
 <div class="container-xxl py-5">
 <div class="container">
    <div class="row g-5 align-items-center">
       <div class="col-lg-6">
          <h6 class="section-title text-start text-primary text-uppercase">About Us</h6>
          <h1 class="mb-4">Welcome to <span class="text-primary text-uppercase">{{turf.turf_name}}</span></h1>
-         <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet</p>
+         <p class="mb-4">"Kick off your journey here, where green fields meet blue skies and friendships are forged through the love of the game. Welcome!"</p>
+         <div class="container mt-4 ">
+            <div class="alert alert-danger extended-box mr-5 pl-5" role="alert">
+                NB  :  Alcohols and Smoking are Strictly Prohibited ***
+            </div>
+        </div>
       </div>
       <div class="col-lg-6">
-         <div class="row g-3">
-            <h3 class="mb-4"> <span class="text-primary text-uppercase">Aminities Provided</span></h3>
+         <div class="row g-3 mt-5">
+            <h3 class="mb-4 "> <span class="text-primary text-uppercase">Aminities Provided</span></h3>
             {% if turf.first_aid %}  
             <div class="row g-3 pb-4">
                <div class="col-sm-4 wow fadeIn" data-wow-delay="0.1s">
@@ -72,31 +77,26 @@
       </div>
    </div>
 </div>
-
-      
-      
-
-        <!-- Service Start -->
-        <div class="container-xxl py-5">
-          <div class="container">
-              <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-                  <h6 class="section-title text-center text-primary text-uppercase">Our Services</h6>
-                  <h1 class="mb-5">Explore Our <span class="text-primary text-uppercase">Grounds</span></h1>
-              </div>
-              <div class="row g-4">
-                {% for ground in grounds %}
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-    <div class="service-item rounded position-relative border border-dark shadow" href="">
-        <span class="position-absolute top-0 end-0 badge bg-danger fw-bold fs-5">{{ ground.price }} / - Per Hour</span>
-        <h3 class="mb-3 text-capitalize">{{ ground.ground_name }}</h3>
-        <a class="btn btn-sm btn-primary rounded py-2 px-4" href="{% url 'available_time_slots' ground_id=ground.id %}"> Book Now </a>
-    </div>
+<!-- Service Start -->
+<div class="container-xxl py-5">
+   <div class="container">
+      <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+         <h6 class="section-title text-center text-primary text-uppercase">Our Services</h6>
+         <h1 class="mb-5">Explore Our <span class="text-primary text-uppercase">Grounds</span></h1>
+      </div>
+      <div class="row g-4">
+         {% for ground in grounds %}
+         <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+            <div class="service-item rounded position-relative border border-dark shadow" href="">
+               <span class="position-absolute top-0 end-0 badge bg-danger fw-bold fs-5">{{ ground.price }} / - Per Hour</span>
+               <h3 class="mb-3 text-capitalize">{{ ground.ground_name }}</h3>
+               <a class="btn btn-sm btn-primary rounded py-2 px-4" href="{% url 'available_time_slots' ground_id=ground.id %}"> Book Now </a>
+            </div>
+         </div>
+         {% endfor %}
+      </div>
+   </div>
 </div>
 
-                {% endfor %}
-            </div>
-            
-          </div>
-      </div>
-      <!-- Service End -->
+<!-- Service End -->
 {% endblock maincontent  %}

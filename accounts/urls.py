@@ -93,6 +93,7 @@ urlpatterns = [
     path('registeruser/', views.show_register,name="showregisterpage"),
     path('saveuser/', users_views.add_user_save,name="saveuserdetails"),
     path('turf-list-user/', users_views.turf_list,name="turf_list_user"),
+    path('get_places/', users_views.get_places, name='get_places'),
     path('turf-details/<int:turf_id>/', users_views.turf_details_user, name='turf_details_user'),
     path('available_time_slots/<int:ground_id>/', users_views.available_time_slots, name='available_time_slots'),
     #  path('show_time_slots/', users_views.show_time_slot_details, name='show_time_slots'),
@@ -103,8 +104,10 @@ urlpatterns = [
     # path('reserve_timeslots/', users_views.reserve_timeslots, name='reserve_timeslots'),
     path('reservation-success-user/', users_views.reservation_success_user, name='success_page_user'),
     path('delete-reservation/<int:reservation_id>/', users_views.delete_reservation, name='delete_reservation'),
-    # path('save-payment/', users_views.save_payment, name='save_payment'),
-    path('payment-success/', users_views.PaymentSuccessView.as_view(), name='payment_success'),
+    path('save_payment/', users_views.save_payment, name='save_payment'),
+    path('payment_done/', users_views.payment_done, name='payment_done'),
+    path('booking_history/', users_views.booking_history, name='booking_history'),
+    # path('payment-success/', users_views.PaymentSuccessView.as_view(), name='payment_success'),
     
    
     

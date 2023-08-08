@@ -1,26 +1,30 @@
 {% extends 'user/user_basefile.html' %}
+{% load static %}
 {% block title %}Booking History{% endblock title %}
 {% block maincontent %}
+<div class="container">
     <h3>Booking History</h3>
-    <h4>Reservations</h4>
-    <ul>
-        {% for reservation in reservations %}
-            <li>
-                {{ reservation.ground_name }} - {{ reservation.reservation_date }}
-            </li>
-        {% empty %}
-            <li>No reservations found.</li>
-        {% endfor %}
-    </ul>
-
-    <h4>Payments</h4>
-    <ul>
-        {% for payment in payments %}
-            <li>
-                Amount: ${{ payment.amount }} - Date: {{ payment.timestamp }}
-            </li>
-        {% empty %}
-            <li>No payments found.</li>
-        {% endfor %}
-    </ul>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Reservation ID</th>
+                <th>Turf Name</th>
+                <th>Ground Name</th>
+                <th>Reservation Date</th>
+                <th>Amount Paid</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.id }}</td>
+                <td>{{ booking.ground.turf.turf_name }}</td>
+                <td>{{ booking.ground.ground_name }}</td>
+                <td>{{ booking.reservation_date }}</td>
+                <td>{{ booking.payment.amount }}</td>  <!-- Assuming Payment is related to Reservation through a ForeignKey -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock maincontent %}
