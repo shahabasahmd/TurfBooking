@@ -1,0 +1,49 @@
+{% extends 'admin/adminbase.html' %}
+{% block tile %}Sorted by Turf{% endblock tile %}
+{% block maincontent %}
+<div class="content container-fluid">
+    <h2>Bookings Sorted by Turf</h2>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered table-center mb-0 datatable">
+                            <!-- Display table headers -->
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Turf Name</th>
+                                    <th>Ground Name</th>
+                                    <th>Selected Date</th>
+                                    <th>Time Slot</th>
+                                    <th>Razorpay Payment ID</th>
+                                    <th>Amount</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in sorted_bookings %}
+                                <tr>
+                                    <td>{{ booking.customer.admin.username }}</td>
+                                    <td>{{ booking.reservation.ground.turf.turf_name }}</td>
+                                    <td>{{ booking.reservation.ground.ground_name }}</td>
+                                    <td>{{ booking.reservation.time_slot.date }}</td>
+                                    <td>
+                                        {{ booking.reservation.time_slot.start_time|date:"h:i A" }} - 
+                                        {{ booking.reservation.time_slot.end_time|date:"h:i A" }}
+                                    </td>
+                                    <td>{{ booking.razorpay_payment_id }}</td>
+                                    <td>{{ booking.amount }}</td>
+                                    <td>{{ booking.timestamp }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock maincontent %}

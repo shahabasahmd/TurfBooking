@@ -34,20 +34,18 @@
                                         <td>{{ reservation.turf_name }}</td>
                                         <td>{{ reservation.ground_name }}</td>
                                         <td>{{ reservation.time_slot }}</td>
-                                        <td>{{ reservation.reserved_date }}</td>
+                                        <td>{{ reservation.booked_date}}</td>
                                         <td class="font-weight-bold text-danger font-italic fs-5">{{ reservation.ground_price }}</td>
                                         <td class="text-right">
                                             <div class="actions">
-                                                <form method="post" action="{% url 'delete_reservation' reservation.id %}" onsubmit="calculateTotalAmount()">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm bg-danger-light">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <label>
+                                                    <input type="checkbox" class="reservation-checkbox" value="{{ reservation.id }}" onclick="toggleReservation(this)">
+                                                    Select
+                                                </label>
                                             </div>
                                         </td>
                                     </tr>
-                                    <input type="hidden" id="reservation_id" name="reservation_id" value="{{reservation.id}}">
+                                    <input type="hidden" class="reservation-id" value="{{ reservation.id }}">
                                     {% endfor %}
                                     
                                     <tr>
@@ -78,7 +76,6 @@
 <!-- Display the total amount -->
 <div class="total-amount">Total Amount: ${{ total_amount }}</div>
 
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     var options = {
@@ -89,21 +86,65 @@
         "description": "Turf Booking",
         "order_id": "{{ order_id }}",
         "handler": function (response){
-            var reservationId = document.getElementById('reservation_id').value;
-            var redirectUrl = "{% url 'payment_done' %}" + "?payment_id=" + response.razorpay_payment_id + "&reservation_id=" + reservationId;
+            var selectedReservationIds = [];
+
+            // Collect all selected reservation IDs
+            var selectedReservationInputFields = document.querySelectorAll('.reservation-checkbox:checked');
+            selectedReservationInputFields.forEach(function(inputField) {
+                selectedReservationIds.push(inputField.value);
+            });
+
+            // If no reservations are selected, show an alert
+            if (selectedReservationIds.length === 0) {
+                alert("No reservations selected for payment.");
+                return;
+            }
+
+            var redirectUrl = "{% url 'payment_done' %}" + "?payment_id=" + response.razorpay_payment_id;
+            redirectUrl += "&reservation_ids=" + selectedReservationIds.join(",");
             window.location.href = redirectUrl;
         },
         "theme": {
             "color": "#3399cc"
         }
     };
+
     var rzp1 = new Razorpay(options);
 
     document.getElementById('rzp-button1').onclick = function(e){
+        // Update the total amount in the Razorpay section based on selected reservations
+        var totalAmount = 0;
+        var selectedCells = document.querySelectorAll('.reservation-checkbox:checked');
+        selectedCells.forEach(function(checkbox) {
+            var row = checkbox.closest('tr');
+            var priceCell = row.querySelector('.font-weight-bold.text-danger.font-italic.fs-5');
+            totalAmount += parseFloat(priceCell.textContent);
+        });
+        options.amount = totalAmount * 100; // Convert to the smallest currency unit (e.g., cents)
+        rzp1 = new Razorpay(options); // Reinitialize Razorpay instance with updated amount
         rzp1.open();
         e.preventDefault();
     }
-</script>
 
+    function updateTotalAmount() {
+        var selectedCells = document.querySelectorAll('.reservation-checkbox:checked');
+        var totalAmountSpan = document.querySelector('.total-amount');
+
+        var totalAmount = 0;
+        selectedCells.forEach(function(checkbox) {
+            var row = checkbox.closest('tr');
+            var priceCell = row.querySelector('.font-weight-bold.text-danger.font-italic.fs-5');
+            totalAmount += parseFloat(priceCell.textContent);
+        });
+
+        totalAmountSpan.textContent = "Total Amount: $" + totalAmount.toFixed(2);
+    }
+
+    // Attach event listener to checkboxes
+    var checkboxes = document.querySelectorAll('.reservation-checkbox');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', updateTotalAmount);
+    });
+</script>
 
 {% endblock maincontent %}

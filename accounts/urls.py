@@ -18,6 +18,7 @@ urlpatterns = [
 
     #  end login and logout 
     # this for admin 
+    path("success",admin_views.success_page,name='success_page_admin'),
     path("adminhome",admin_views.adminhome,name="adminhome"),
     path('customers-admin/', admin_views.customer_list_admin, name='customer_list_admin'),
     path('delete_customer_admin/<int:customer_id>/', admin_views.delete_customer_admin, name='delete_customer_admin'),
@@ -54,7 +55,9 @@ urlpatterns = [
     path('admin/select_date_and_reservations/<int:ground_id>/', admin_views.select_date_and_reservations, name='select_date_and_reservations'),
     # path('client/ground/<int:ground_id>/reservation-details/', admin_views.ground_reservation_details, name='ground_reservation_details'),
     # path('reservation-list-admin/', admin_views.reservation_list, name='reservation_list_admin'),
-    
+    path('admin/bookings/',admin_views.booking_page,name='bookings_page_admin'),
+     path('sort-by-turf/', admin_views.sort_by_turf, name='sort-by-turf'),
+    path('sort-by-date/', admin_views.sort_by_date, name='sort-by-date'),
     
     
 
@@ -103,7 +106,6 @@ urlpatterns = [
 
     # path('reserve_timeslots/', users_views.reserve_timeslots, name='reserve_timeslots'),
     path('reservation-success-user/', users_views.reservation_success_user, name='success_page_user'),
-    path('delete-reservation/<int:reservation_id>/', users_views.delete_reservation, name='delete_reservation'),
     path('save_payment/', users_views.save_payment, name='save_payment'),
     path('payment_done/', users_views.payment_done, name='payment_done'),
     path('booking_history/', users_views.booking_history, name='booking_history'),

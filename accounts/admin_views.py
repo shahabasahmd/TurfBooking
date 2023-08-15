@@ -10,6 +10,10 @@ from django.shortcuts import get_object_or_404
 from datetime import datetime, timedelta
 
 
+def success_page(request):
+    return render(request,'admin/success_admin.html')
+
+
 @login_required(login_url='/')
 def adminhome(request):
     client=Clients.objects.all()
@@ -159,7 +163,7 @@ def add_turf_save(request):
             image=image,
         )
 
-        return redirect('add_turf_page') 
+        return redirect('success_page_admin') 
 
     else:
         return render(request, 'admin/addturf.html')
@@ -190,7 +194,7 @@ def add_ground_page_admin(request):
         ground.save()
 
         # Redirect to the page you want to show after the form submission
-        return redirect('add_ground_page_admin')  # Change 'some_view_name' to the desired view name
+        return redirect('success_page_admin')  # Change 'some_view_name' to the desired view name
 
     # If it's not a POST request, render the template as usual
     return render(request, 'admin/add_ground_page_admin.html', {'turfs': TurfDetails.objects.all()})
@@ -283,7 +287,7 @@ def add_time_slot_admin(request):
             start_datetime = datetime.strptime(start_time, '%H:%M')
 
         # Redirect to a success page after successful data submission
-        return redirect('success_page')
+        return redirect('success_page_admin')
 
     # If the request method is GET, render the form page
     return render(request, 'admin/timeslot_admin.html', context={})
@@ -346,3 +350,29 @@ def select_date_and_reservations(request, ground_id):
 
     # Render the template with the necessary context
     return render(request, 'admin/ground_reservation_details.html', {'ground': ground, 'selected_date': selected_date, 'reservations': reservations})
+
+
+
+def booking_page(request):
+    all_bookings = Bookings.objects.all().order_by('-timestamp')
+    
+    context = {
+        'all_bookings': all_bookings
+    }
+    
+    return render(request, 'admin/bookings_admin.html', context)
+
+
+def sort_by_turf(request):
+    sorted_bookings = Bookings.objects.order_by('reservation__ground__turf__turf_name')
+    context = {
+        'sorted_bookings': sorted_bookings
+    }
+    return render(request, 'admin/sorted_by_turf.html', context)
+
+def sort_by_date(request):
+    sorted_bookings = Bookings.objects.order_by('reservation__time_slot__date')
+    context = {
+        'sorted_bookings': sorted_bookings
+    }
+    return render(request, 'admin/sorted_by_date.html', context)

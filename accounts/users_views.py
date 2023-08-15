@@ -92,17 +92,17 @@ def available_time_slots(request, ground_id):
 def timeslot_list_user(request):
     selected_date = request.GET.get('selected_date')
     ground_id = request.GET.get('ground_id')
-    
 
     if selected_date and ground_id:
         # Convert the selected_date to a Python datetime object
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
 
-        # Get the TurfDetails object based on the ground_id
+        # Get the Ground object based on the ground_id
         ground = get_object_or_404(Ground, id=ground_id)
 
         # Filter the timeslots based on the selected_date and the related ground
-        timeslots = TimeSlot.objects.filter(ground=ground, date=selected_date)
+        # and also filter by is_available
+        timeslots = TimeSlot.objects.filter(ground=ground, date=selected_date, is_available=True)
     else:
         ground = None
         timeslots = TimeSlot.objects.none()
@@ -167,13 +167,7 @@ def reserve_timeslots(request):
     return render(request, 'user/list_timeslot_user.html')
 
 
-def delete_reservation(request, reservation_id):
-    reservation = get_object_or_404(Reservation, id=reservation_id)
 
-    if request.method == 'POST':
-        reservation.delete()
-        # You can add a success message here if you want
-    return redirect('success_page_user')
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -186,19 +180,22 @@ def reservation_success_user(request):
     total_amount = 0
 
     for reservation in reservations:
-        reservation_details = {
-            'id': reservation.id,
-            'turf_name': reservation.ground.turf.turf_name,
-            'ground_name': reservation.ground.ground_name,
-            'reserved_date': reservation.reservation_date.strftime('%B %d, %Y'),
-            'ground_price': reservation.ground.price,
-            'time_slot': f"{reservation.time_slot.start_time.strftime('%I:%M %p')} - {reservation.time_slot.end_time.strftime('%I:%M %p')}"
-        }
-        reservation_details_list.append(reservation_details)
+        if reservation.time_slot.is_available:  # Check availability
+            reservation_details = {
+                'id': reservation.id,
+                'turf_name': reservation.ground.turf.turf_name,
+                'ground_name': reservation.ground.ground_name,
+                'reserved_date': reservation.reservation_date.strftime('%B %d, %Y'),
+                'ground_price': reservation.ground.price,
+                'time_slot': f"{reservation.time_slot.start_time.strftime('%I:%M %p')} - {reservation.time_slot.end_time.strftime('%I:%M %p')}",
+                'booked_date': reservation.time_slot.date.strftime('%B %d, %Y'),
+            }
+            reservation_details_list.append(reservation_details)
 
-        if reservation_details['ground_price']:
-            total_amount += float(reservation_details['ground_price'])
-            razoramount = total_amount * 100
+            if reservation_details['ground_price']:
+                total_amount += float(reservation_details['ground_price'])
+
+    razoramount = int(total_amount * 100)  # Calculate outside the loop
 
     context = {
         'reservation_details_list': reservation_details_list,
@@ -207,6 +204,7 @@ def reservation_success_user(request):
     }
 
     return render(request, 'user/reservation_details_user.html', context)
+
 
 @csrf_exempt
 def save_payment(request):
@@ -223,7 +221,7 @@ def save_payment(request):
 
             customer = request.user.customer
 
-            payment = Payment.objects.create(
+            payment = Bookings.objects.create(
                 customer=customer,
                 reservation=reservation,
                 razorpay_payment_id=razorpay_payment_id,
@@ -239,31 +237,43 @@ def save_payment(request):
 def payment_done(request):
     if request.method == 'GET':
         payment_id = request.GET.get('payment_id')
-        reservation_id = request.GET.get('reservation_id')
+        reservation_ids = request.GET.get('reservation_ids')  # Change to 'reservation_ids' plural
 
         if not payment_id:
             return JsonResponse({'status': 'error', 'message': 'Payment ID is missing'})
 
-        if not reservation_id:
-            return JsonResponse({'status': 'error', 'message': 'Reservation ID is missing'})
+        if not reservation_ids:
+            return JsonResponse({'status': 'error', 'message': 'Reservation IDs are missing'})
 
         try:
-            reservation = Reservation.objects.get(id=reservation_id)
-    
-    # Assuming you have a ForeignKey or OneToOneField relationship between CustomUser and Customers
-            customer = Customers.objects.get(admin=request.user) # Modify 'customuser' if it's named differently
-    
-            amount = reservation.ground.price
+            customer = Customers.objects.get(admin=request.user)
 
-            payment = Payment.objects.create(
-                customer=customer,
-                reservation=reservation,
-                razorpay_payment_id=payment_id,
-                amount=amount
-            )
+            # Split the reservation_ids string into a list of integers
+            reservation_id_list = [int(reservation_id) for reservation_id in reservation_ids.split(',')]
+
+            # Get the total amount based on the selected reservations
+            total_amount = 0
+            for reservation_id in reservation_id_list:
+                try:
+                    reservation = Reservation.objects.get(id=reservation_id)
+                    total_amount += reservation.ground.price
+                    # Create a booking for each selected reservation
+                    payment = Bookings.objects.create(
+                        customer=customer,
+                        reservation=reservation,
+                        razorpay_payment_id=payment_id,
+                        amount=reservation.ground.price  # Assuming you want to save the amount for each reservation
+                    )
+                    
+                    # Mark the associated time slot as not available
+                    time_slot = reservation.time_slot
+                    time_slot.is_available = False
+                    time_slot.save()
+                except Reservation.DoesNotExist:
+                    pass  # Ignore non-existent reservations
 
             print("Payment Details Saved Successfully")
-            return redirect('booking_history')  # Redirect to the desired page
+            return redirect('booking_history')
         except Exception as e:
             print("Error:", e)
             return JsonResponse({'status': 'error', 'message': 'An error occurred while saving payment details'})
@@ -271,17 +281,15 @@ def payment_done(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
+
+
+
+
 @login_required
 def booking_history(request):
-    try:
-        customer = Customers.objects.get(admin=request.user) 
-    except Customers.DoesNotExist:
-        customer = None
-
-    if customer:
-        bookings = Reservation.objects.filter(customer=customer)
-    else:
-        bookings = []
+    # Fetch the bookings for the logged-in customer
+    customer = request.user.customers
+    bookings = Bookings.objects.filter(customer=customer)
 
     context = {
         'bookings': bookings
