@@ -110,7 +110,6 @@ def timeslot_list_user(request):
     return render(request, 'user/list_timeslot_user.html', {'ground': ground, 'timeslots': timeslots, 'selected_date': selected_date})
 
 
-
 @login_required
 def reserve_timeslots(request):
     if request.method == 'POST':
@@ -125,33 +124,27 @@ def reserve_timeslots(request):
             customer = Customers.objects.get(admin=request.user)
         except Customers.DoesNotExist:
             return HttpResponse("error") 
-         
-        ground = Ground.objects.get(pk=ground_id)
-        reservation_details_list = []
 
-        # Convert the selected_date_str to the correct format (YYYY-MM-DD)
+        try:
+            ground = Ground.objects.get(pk=ground_id)
+        except Ground.DoesNotExist:
+            return HttpResponse("error") 
+
+        reservation_details_list = []
         selected_date = datetime.strptime(selected_date_str, '%b. %d, %Y').strftime('%Y-%m-%d')
 
-
-        # Loop through the selected time slot IDs and create a Reservation object for each one
         for time_slot_id_str in delete_checkbox_values:
             try:
                 time_slot_id = int(time_slot_id_str)
-            except ValueError:
-                # Handle the case where the time_slot_id_str is not a valid integer
-                continue
-
-            try:
                 time_slot = TimeSlot.objects.get(pk=time_slot_id)
-            except TimeSlot.DoesNotExist:
+            except (ValueError, TimeSlot.DoesNotExist):
+                # Skip invalid time slot IDs or non-existent time slots
                 continue
 
-            # Check if the timeslot is already reserved by the current customer on the selected date
             if Reservation.objects.filter(customer=customer, time_slot=time_slot, reservation_date=selected_date).exists():
-                # Skip this timeslot as it's already reserved
+                # Skip already reserved time slots
                 continue
 
-            # Create the reservation and add details to the list
             reservation = Reservation.objects.create(customer=customer, ground=ground, time_slot=time_slot, reservation_date=selected_date)
             reservation_details = {
                 'turf_name': ground.turf.turf_name,
@@ -162,8 +155,12 @@ def reserve_timeslots(request):
             }
             reservation_details_list.append(reservation_details)
 
+        # Pass the reservation details list to the template or success page
+        context = {
+            'reservation_details_list': reservation_details_list,
+        }
         return redirect('success_page_user') 
-    
+
     return render(request, 'user/list_timeslot_user.html')
 
 
@@ -234,6 +231,8 @@ def save_payment(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
+from django.db import transaction
+
 def payment_done(request):
     if request.method == 'GET':
         payment_id = request.GET.get('payment_id')
@@ -251,26 +250,29 @@ def payment_done(request):
             # Split the reservation_ids string into a list of integers
             reservation_id_list = [int(reservation_id) for reservation_id in reservation_ids.split(',')]
 
-            # Get the total amount based on the selected reservations
-            total_amount = 0
-            for reservation_id in reservation_id_list:
-                try:
-                    reservation = Reservation.objects.get(id=reservation_id)
-                    total_amount += reservation.ground.price
-                    # Create a booking for each selected reservation
-                    payment = Bookings.objects.create(
-                        customer=customer,
-                        reservation=reservation,
-                        razorpay_payment_id=payment_id,
-                        amount=reservation.ground.price  # Assuming you want to save the amount for each reservation
-                    )
-                    
-                    # Mark the associated time slot as not available
-                    time_slot = reservation.time_slot
-                    time_slot.is_available = False
-                    time_slot.save()
-                except Reservation.DoesNotExist:
-                    pass  # Ignore non-existent reservations
+            with transaction.atomic():
+                total_amount = 0
+                for reservation_id in reservation_id_list:
+                    try:
+                        reservation = Reservation.objects.get(id=reservation_id)
+                        total_amount += reservation.ground.price
+
+                        # Create a booking for each selected reservation
+                        payment = Bookings.objects.create(
+                            customer=customer,
+                            reservation=reservation,
+                            razorpay_payment_id=payment_id,
+                            amount=reservation.ground.price,
+                            turf_added_by=reservation.ground.turf.added_by,  # Set the added_by field
+                            payment_status='pending',  # Set the payment status
+                        )
+
+                        # Mark the associated time slot as not available
+                        time_slot = reservation.time_slot
+                        time_slot.is_available = False
+                        time_slot.save()
+                    except Reservation.DoesNotExist:
+                        pass  # Ignore non-existent reservations
 
             print("Payment Details Saved Successfully")
             return redirect('booking_history')
@@ -280,6 +282,7 @@ def payment_done(request):
 
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
 
 
 
@@ -296,3 +299,20 @@ def booking_history(request):
     }
 
     return render(request, 'user/booking_history.html', context)
+
+
+from .models import Enquiry
+def enquiry_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        message = request.POST.get('message')
+
+        enquiry = Enquiry(email=email, phone=phone, message=message)
+        enquiry.save()
+
+        messages.success(request, "Your information has been received. Our team will contact you soon.")
+
+        return render(request, 'user/home.html')    
+
+    return render(request, 'user/home.html')    

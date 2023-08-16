@@ -50,6 +50,8 @@ urlpatterns = [
     path('turf/<int:turf_id>/grounds/', admin_views.ground_list, name='groundlist_timeslot_admin'),
     path('ground/<int:ground_id>/timeslots/', admin_views.timeslot_list, name='timeslot_list_admin'),
     path('admin/timeslot/<int:timeslot_id>/delete/', admin_views.delete_timeslot_admin, name='delete_timeslot_admin'),
+    path('timeslots/<int:timeslot_id>/block/', admin_views.block_timeslot, name='block_timeslot_admin'),
+    path('timeslots/<int:timeslot_id>/unblock/', admin_views.unblock_timeslot, name='unblock_timeslot_admin'),
     path('turf-list-reservation/', admin_views.turf_list_reservation, name='turf_list_reservation_admin'),
     path('turf-reservation/<int:turf_id>/grounds/', admin_views.ground_list_reservation, name='groundlist_reservation_admin'),
     path('admin/select_date_and_reservations/<int:ground_id>/', admin_views.select_date_and_reservations, name='select_date_and_reservations'),
@@ -58,6 +60,10 @@ urlpatterns = [
     path('admin/bookings/',admin_views.booking_page,name='bookings_page_admin'),
      path('sort-by-turf/', admin_views.sort_by_turf, name='sort-by-turf'),
     path('sort-by-date/', admin_views.sort_by_date, name='sort-by-date'),
+    path('payments-admin/', admin_views.payments_admin, name='payments-admin'),
+    path('update-payment-status/', admin_views.update_payment_status, name='update-payment-status'),
+    path('enquiry-list/', admin_views.enquiry_list, name='enquiry_list'),
+    path('enquiries/<int:pk>/delete/', admin_views.delete_enquiry, name='delete-enquiry'),
     
     
 
@@ -85,6 +91,14 @@ urlpatterns = [
     # path('timeslot-list-details/<int:turf_id>/', client_views.timeslot_list_client, name='timeslot_list_client'),
     # path('timeslot-page-forclient/', client_views.timeslot_page_client, name='timeslot_page_client'),
     # path('timeslot-list-client/<int:turf_id>/<int:timeslot_id>/delete/', client_views.delete_timeslot_client, name='delete_timeslot_client'),
+    path('client/bookings/', client_views.bookings_client, name='client_bookings'),
+    path('client/paymentlist/', client_views.paymentlist_client, name='paymentlist_client'),
+    path('payment-history/', client_views.payment_history, name='payment-history'),
+    path('payment-history/pending/', client_views.pending_payments, name='sort-pending-bookings'),
+    path('payment-history/completed/', client_views.completed_payments, name='sort-completed-bookings'),
+    
+
+
     
 
     
@@ -109,7 +123,8 @@ urlpatterns = [
     path('save_payment/', users_views.save_payment, name='save_payment'),
     path('payment_done/', users_views.payment_done, name='payment_done'),
     path('booking_history/', users_views.booking_history, name='booking_history'),
-    # path('payment-success/', users_views.PaymentSuccessView.as_view(), name='payment_success'),
+    path('submit-enquiry/', users_views.enquiry_view, name='enquiry-view'),
+
     
    
     

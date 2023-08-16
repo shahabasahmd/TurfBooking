@@ -322,6 +322,18 @@ def delete_timeslot_admin(request, timeslot_id):
     
     return render(request, 'admin/list_timeslot_admin.html', {'timeslot': timeslot})
 
+def block_timeslot(request, timeslot_id):
+    timeslot = get_object_or_404(TimeSlot, id=timeslot_id)
+    timeslot.is_available = False
+    timeslot.save()
+    return redirect('timeslot_list_admin', ground_id=timeslot.ground.id)
+
+def unblock_timeslot(request, timeslot_id):
+    timeslot = get_object_or_404(TimeSlot, id=timeslot_id)
+    timeslot.is_available = True
+    timeslot.save()
+    return redirect('timeslot_list_admin', ground_id=timeslot.ground.id)
+
 
 @login_required
 def turf_list_reservation(request):
@@ -376,3 +388,43 @@ def sort_by_date(request):
         'sorted_bookings': sorted_bookings
     }
     return render(request, 'admin/sorted_by_date.html', context)
+
+@login_required
+def payments_admin(request):
+    # Get all bookings for rendering in the template
+    all_bookings = Bookings.objects.all()
+
+    context = {
+        'all_bookings': all_bookings,
+    }
+
+    return render(request, 'admin/paymentspage_admin.html', context)
+
+
+def update_payment_status(request):
+    if request.method == 'POST':
+        booking_id = request.POST.get('booking_id')
+        new_status = request.POST.get('new_status')
+        
+        try:
+            booking = Bookings.objects.get(pk=booking_id)
+            booking.payment_status = new_status
+            booking.save()
+            
+            return JsonResponse({'message': 'Payment status updated successfully.'})
+        except Bookings.DoesNotExist:
+            return JsonResponse({'error': 'Booking not found.'})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'})
+    
+   
+
+def enquiry_list(request):
+    enquiries = Enquiry.objects.all().order_by('-timestamp_enquiry')  # Order by timestamp in descending order
+    return render(request, 'admin/enquiry.html', {'enquiries': enquiries})
+
+def delete_enquiry(request, pk):
+    enquiry = get_object_or_404(Enquiry, pk=pk)
+    if request.method == 'POST':
+        enquiry.delete()
+    return redirect('enquiry_list')

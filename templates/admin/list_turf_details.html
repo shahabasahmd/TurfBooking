@@ -71,9 +71,8 @@
                                   
                                  <form method="post" action="{% url 'delete_turf_admin' turf_id=turf.id %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm bg-danger-light">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete <i class="fas fa-trash"></i></button>
                                 </form>
                                </div>
                             </td>

@@ -133,3 +133,20 @@ class Bookings(models.Model):
     razorpay_payment_id = models.CharField(max_length=100,null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
+    turf_added_by=models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True)
+    PAYMENT_CHOICES = (
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+    )
+    payment_status = models.CharField(max_length=10, choices=PAYMENT_CHOICES,default='Pending')
+    
+
+from django.utils import timezone
+
+class Enquiry(models.Model):
+    email = models.EmailField()
+    phone = models.CharField(max_length=15)
+    message = models.TextField()
+    timestamp_enquiry = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return self.email  

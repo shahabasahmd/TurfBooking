@@ -55,7 +55,8 @@
                               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Profile</a>
                               <div class="dropdown-menu rounded-0 m-0">
                                  <a href="#" class="dropdown-item">Profile</a>
-                                 <a href="" class="dropdown-item">Booking History</a>
+                                 <a href="{% url 'booking_history' %}" class="dropdown-item">Booking History</a>
+                                 <a href="{% url 'success_page_user' %}" class="dropdown-item">Reservations</a>
                                  <a href="{% url 'dologout' %}" class="dropdown-item">Logout</a>
                               </div>
                            </div>

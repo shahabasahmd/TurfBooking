@@ -31,6 +31,8 @@
                             <th>Date</th>
                             <th>Start Time</th>
                             <th>End Time</th>
+                            <th>Action</th>
+                            <th>Block the slot </th>
                            </tr>
                       </thead>
                         <tbody>
@@ -46,13 +48,24 @@
                                <div class="actions">
                                  <form method="post" action="{% url 'delete_timeslot_admin' timeslot_id=timeslot.id %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm bg-danger-light">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete <i class="fas fa-trash"></i></button>
                                 </form>
                                   
                                </div>
                             </td>
+                            <td class="text-right">
+                              <div class="actions">
+                                  <form method="post" action="{% url 'block_timeslot_admin' timeslot_id=timeslot.id %}">
+                                      {% csrf_token %}
+                                      {% if  timeslot.is_available %}
+                                          <button type="submit" class="btn btn-danger btn-sm">Block</button>
+                                      {% else %}
+                                          <button type="submit" class="btn btn-success btn-sm">Cancel Booking</button>
+                                      {% endif %}
+                                  </form>
+                              </div>
+                          </td>
+
                          </tr>
                          {% endfor %}
                          {% else %}

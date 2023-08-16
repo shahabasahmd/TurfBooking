@@ -307,52 +307,42 @@ def select_date_and_reservations(request, ground_id):
 
     # Render the template with the necessary context
     return render(request, 'client/ground_reservation_details_client.html', {'ground': ground, 'selected_date': selected_date, 'reservations': reservations})
-# def timeslot_page_client(request):
-#     if request.method == 'POST':
-#         turf_id = request.POST.get('turf_name')
-#         day = request.POST.get('day')
-#         start_time = request.POST.get('start_time')
-#         end_time = request.POST.get('end_time')
-
-#         # Assuming you have the turf object corresponding to the selected turf_id
-#         turf = TurfDetails.objects.get(id=turf_id)
-
-#         # Create and save the time slot
-#         time_slot = TimeSlot.objects.create(
-#             turf_name=turf,
-#             added_by=request.user,
-#             day=day,
-#             start_time=start_time,
-#             end_time=end_time
-#         )
-#         time_slot.save()
-#         return redirect('timeslot_page_client')
-
-#     # Fetch user's turfs for the dropdown
-#     user_turfs = TurfDetails.objects.filter(added_by=request.user)
-
-#     context = {
-#         'user_turfs': user_turfs
-#     }
-#     return render(request, 'client/timeslotpage_client.html', context)
-
-
-# @login_required
-# def timeslot_list_client(request, turf_id):
-#     turf = get_object_or_404(TurfDetails, id=turf_id, added_by=request.user)
-#     timeslots = TimeSlot.objects.filter(turf_name=turf)
-#     return render(request, 'client/list_timeslot_client.html', {'turf': turf, 'timeslots': timeslots})
 
 
 
-# @login_required
-# def delete_timeslot_client(request, turf_id, timeslot_id):
-#     # Retrieve the time slot object to be deleted
-#     timeslot = get_object_or_404(TimeSlot, id=timeslot_id, turf_name__id=turf_id, added_by=request.user)
-
-#     if request.method == 'POST':
-#         # Delete the time slot
-#         timeslot.delete()
+@login_required
+def bookings_client(request):
+    logged_in_client = request.user  # Assuming the logged-in user is a CustomUser
+    client_bookings = Bookings.objects.filter(turf_added_by=logged_in_client)
     
-#     # Redirect back to the time slot list page
-#     return redirect('timeslot_list_client', turf_id=turf_id)
+    context = {
+        'client_bookings': client_bookings,
+    }
+    return render(request, 'client/bookings_client.html', context)
+
+
+
+@login_required
+def paymentlist_client(request):
+    logged_in_client = request.user  # Assuming the logged-in user is a CustomUser
+    client_bookings = Bookings.objects.filter(turf_added_by=logged_in_client)
+    
+    context = {
+        'client_bookings': client_bookings,
+    }
+    return render(request, 'client/payment_list_client.html', context)
+
+def payment_history(request):
+    client_bookings = Bookings.objects.filter(turf_added_by=request.user)
+    context = {'client_bookings': client_bookings}
+    return render(request, 'client/payment_list_client.html', context)
+
+def pending_payments(request):
+    client_bookings = Bookings.objects.filter(turf_added_by=request.user, payment_status='pending')
+    context = {'client_bookings': client_bookings}
+    return render(request, 'client/payment_list_client.html', context)
+
+def completed_payments(request):
+    client_bookings = Bookings.objects.filter(turf_added_by=request.user, payment_status='completed')
+    context = {'client_bookings': client_bookings}
+    return render(request, 'client/payment_list_client.html', context)
