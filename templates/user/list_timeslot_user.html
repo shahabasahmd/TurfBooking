@@ -14,10 +14,10 @@
                 <div class="search_wrap">
                     <form method="get" class="search_form" action="{% url 'timeslot_list_user' %}">
                         <div class="input-group">
-                            <input type="date" class="form-control form-control-xl" name="selected_date" value="{{ selected_date }}" placeholder="Select a date">
+                            <input type="date" class="form-control form-control-xl mr-5" name="selected_date" value="{{ selected_date }}" placeholder="Select a date">
                             <input type="hidden" name="ground_id" value="{{ ground.id }}">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary btn-xl ml-2" type="submit">Search</button>
+                            <div class="input-group-append" style="margin-left: 20px;">
+                                <button class="btn btn-primary btn-xl" type="submit">Search</button>
                             </div>
                         </div>
                     </form>
@@ -26,62 +26,59 @@
         </div>
     </div>
 </div>
-{% if selected_date %}
-<div class="row mt-4">
-    <div class="col-lg-10 offset-lg-1">
-        <div class="card card-table">
-            <div class="card-header">
-                <h3>Available Time Slots for Turf on {{ selected_date }}</h3>
-                <h4>Time Slot Details</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <div class="container">
-                        <form method="post" action="{% url 'reserve_timeslots' %}">
-                            {% csrf_token %}
-                            <table class="table table-hover table-center mb-0 datatable" style="width: 100%;">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Start Time</th>
-                                        <th>End Time</th>
-                                        <th class="text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% if timeslots %}
-                                    {% for timeslot in timeslots %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>{{ timeslot.start_time }}</td>
-                                        <td>{{ timeslot.end_time }}</td>
-                                        <td class="text-right">
-                                            <div class="actions">
-                                                <div class="form-check">
-                                                    <input type="hidden" class="form-control form-control-xl" name="selected_date" value="{{ selected_date }}" placeholder="Select a date">
-                                                    <input type="hidden" name="ground_id" value="{{ ground.id }}">
-                                                    <input type="checkbox" class="form-check-input" id="deleteCheckbox{{ timeslot.id }}" name="delete_checkbox" value="{{ timeslot.id }}">
 
-                                                </div>
+{% if selected_date %}
+<div class="content container">
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card card-table">
+            <div class="card-header bg-muted text-white">
+                <h3 class="mb-0 text-secondary font-weight-bold"  style="font-family:Playfair Display;">Available Time Slots for Turf on <span class="text-danger font-weight-bold">{{ selected_date }}</span></h3>
+            </div>
+            <div class="card-body mt-3">
+                <div class="table-responsive">
+                    <form method="post" action="{% url 'reserve_timeslots' %}">
+                        {% csrf_token %}
+                        <table class="table table-hover table-bordered table-center table-responsive mb-0 datatable">
+                            <thead class="thead-dark bg-dark">
+                                <tr>
+                                    <th class="font-weight-bold text-primary text-center">No</th>
+                                    <th class="font-weight-bold text-primary text-center">Start Time</th>
+                                    <th class="font-weight-bold text-primary text-center">End Time</th>
+                                    <th class="font-weight-bold text-primary text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if timeslots %}
+                                {% for timeslot in timeslots %}
+                                <tr>
+                                    <td class="text-center">{{ forloop.counter }}</td>
+                                    <td class="text-center">{{ timeslot.start_time }}</td>
+                                    <td class="text-center">{{ timeslot.end_time }}</td>
+                                    <td class="text-right align-middle">
+                                        <div class="actions">
+                                            <div class="form-check">
+                                                <input type="hidden" class="form-control form-control-xl" name="selected_date" value="{{ selected_date }}" placeholder="Select a date">
+                                                <input type="hidden" name="ground_id" value="{{ ground.id }}">
+                                                <input type="checkbox" class="form-check-input" id="deleteCheckbox{{ timeslot.id }}" name="delete_checkbox" value="{{ timeslot.id }}">
                                             </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                    <tr>
-                                        <td colspan="3"></td>
-                                        <td class="text-right">
-                                            <button class="btn btn-primary btn-lg" type="submit">Reserve Now</button>
-                                        </td>
-                                    </tr>
-                                    {% else %}
-                                    <tr>
-                                        <td colspan="4">No Timeslot details found</td>
-                                    </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </form>
-                    </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4">No Timeslot details found</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-primary btn-block px-4 py-2 pr-5 rounded-pill" type="submit">
+                                Reserve Now
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -90,5 +87,5 @@
 {% else %}
 <p>Please select a date.</p>
 {% endif %}
-
-{% endblock maincontent  %} 
+</div>
+{% endblock maincontent  %}

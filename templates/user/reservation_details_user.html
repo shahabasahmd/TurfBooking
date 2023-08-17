@@ -1,150 +1,153 @@
 {% extends 'user/user_basefile.html' %}
 {% load static %}
 {% block title %}Turf slot details{% endblock title %}
+{% block customstyles %}
+<style>
+    /* Add your custom styles here */
+    .reservation-item {
+        /* Custom styles for the reservation item div */
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+    /* Add more custom styles as needed */
+</style>
+{% endblock customstyles %}
+
 {% block maincontent %}
-
-<div class="row mt-4">
-    <div class="col-lg-10 offset-lg-1">
-        <div class="card card-table">
-            <div class="card-header">
-                <h3>Reservation Details</h3>
-            </div>
-            <div class="card-body">
+<div class="content container-sm">
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card card-table">
+             <div class="card-header bg-muted text-white">
+                <h3 class="mb-0 text-secondary font-weight-bold" style="font-family: Playfair Display;"><span class="text-danger font-weight-bold">Reservation Details</span></h3>
+             </div>
+             <div class="card-body mt-3">
                 <div class="table-responsive">
-                    <div class="container">
-                        <form method="post" id="myform">
-                            {% csrf_token %}
-                            <table class="table table-hover table-center mb-0 datatable" style="width: 100%;">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Turf</th>
-                                        <th>Ground Name</th>
-                                        <th>Time slot</th>
-                                        <th>Booked Date</th>
-                                        <th>Amount Per Slot</th>
-                                        <th class="text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% if reservation_details_list %}
-                                    {% for reservation in reservation_details_list %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>{{ reservation.turf_name }}</td>
-                                        <td>{{ reservation.ground_name }}</td>
-                                        <td>{{ reservation.time_slot }}</td>
-                                        <td>{{ reservation.booked_date}}</td>
-                                        <td class="font-weight-bold text-danger font-italic fs-5">{{ reservation.ground_price }}</td>
-                                        <td class="text-right">
-                                            <div class="actions">
-                                                <label>
-                                                    <input type="checkbox" class="reservation-checkbox" value="{{ reservation.id }}" onclick="toggleReservation(this)">
-                                                    Select
-                                                </label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <input type="hidden" class="reservation-id" value="{{ reservation.id }}">
-                                    {% endfor %}
-                                    
-                                    <tr>
-                                        <td colspan="6"></td>
-                                        <td class="text-right">
-                                            <input type="hidden" id="total-amount" name="total-amount" value="{{ total_amount }}">
-                                            
-                                            <button id="rzp-button1" class="btn btn-warning mt-3 p-3 px-5 fw-bold" type="button">Make Payment</button>
-
-                                        </td>
-                                    </tr>
-                                    
-                                    {% else %}
-                                    <tr>
-                                        <td colspan="7">No Timeslot details found</td>
-                                    </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </form>
-                    </div>
-                </div>
+                   <form method="post" id="myform">
+                      {% csrf_token %}
+                      <table class="table table-hover table-bordered table-center table-responsive{-sm|-md|-lg} mb-0 datatable">
+                        <thead class="thead-dark bg-dark">
+                           <tr>
+                              <th class="font-weight-bold text-primary text-center">No</th>
+                              <th class="font-weight-bold text-primary text-center">Turf</th>
+                              <th class="font-weight-bold text-primary text-center">Ground Name</th>
+                              <th class="font-weight-bold text-primary text-center">Time slot</th>
+                              <th class="font-weight-bold text-primary text-center">Booked Date</th>
+                              <th class="font-weight-bold text-primary text-center">Amount Per Slot</th>
+                              <th class="font-weight-bold text-primary text-center">Action</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                            <div class="reservation-item">
+                           {% if reservation_details_list %}
+                           {% for reservation in reservation_details_list %}
+                           <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ reservation.turf_name }}</td>
+                              <td>{{ reservation.ground_name }}</td>
+                              <td>{{ reservation.time_slot }}</td>
+                              <td>{{ reservation.booked_date}}</td>
+                              <td class="font-weight-bold text-danger font-italic fs-5">{{ reservation.ground_price }}</td>
+                              <td class="text-right">
+                                 <div class="actions">
+                                    <label>
+                                    <input type="checkbox" class="reservation-checkbox" value="{{ reservation.id }}" onclick="toggleReservation(this)">
+                                    </label>
+                                 </div>
+                              </td>
+                           </tr>
+                            </div>
+                           <input type="hidden" class="reservation-id" value="{{ reservation.id }}">
+                           {% endfor %}
+                           {% else %}
+                           <tr>
+                              <td colspan="7">No Timeslot details found</td>
+                           </tr>
+                           {% endif %}
+                        </tbody>
+                     </table>
+                     <div class="text-center mt-3">
+                        <input type="hidden" id="total-amount" name="total-amount" value="{{ total_amount }}">
+                        <button id="rzp-button1" class="btn btn-warning mt-3 p-3 px-5 fw-bold" type="button">Make Payment</button>
+                     </div>
+                  </form>
+               </div>
             </div>
-        </div>
-    </div>
+         </div>
+      </div>
+   </div>
 </div>
-
 <!-- Display the total amount -->
 <div class="total-amount">Total Amount: ${{ total_amount }}</div>
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-    var options = {
-        "key": "rzp_test_mEBXoRn25vFX8a",
-        "amount": "{{ razoramount }}",
-        "currency": "INR",
-        "name": "{{ request.user }}",
-        "description": "Turf Booking",
-        "order_id": "{{ order_id }}",
-        "handler": function (response){
-            var selectedReservationIds = [];
-
-            // Collect all selected reservation IDs
-            var selectedReservationInputFields = document.querySelectorAll('.reservation-checkbox:checked');
-            selectedReservationInputFields.forEach(function(inputField) {
-                selectedReservationIds.push(inputField.value);
-            });
-
-            // If no reservations are selected, show an alert
-            if (selectedReservationIds.length === 0) {
-                alert("No reservations selected for payment.");
-                return;
-            }
-
-            var redirectUrl = "{% url 'payment_done' %}" + "?payment_id=" + response.razorpay_payment_id;
-            redirectUrl += "&reservation_ids=" + selectedReservationIds.join(",");
-            window.location.href = redirectUrl;
-        },
-        "theme": {
-            "color": "#3399cc"
-        }
-    };
-
-    var rzp1 = new Razorpay(options);
-
-    document.getElementById('rzp-button1').onclick = function(e){
-        // Update the total amount in the Razorpay section based on selected reservations
-        var totalAmount = 0;
-        var selectedCells = document.querySelectorAll('.reservation-checkbox:checked');
-        selectedCells.forEach(function(checkbox) {
-            var row = checkbox.closest('tr');
-            var priceCell = row.querySelector('.font-weight-bold.text-danger.font-italic.fs-5');
-            totalAmount += parseFloat(priceCell.textContent);
-        });
-        options.amount = totalAmount * 100; // Convert to the smallest currency unit (e.g., cents)
-        rzp1 = new Razorpay(options); // Reinitialize Razorpay instance with updated amount
-        rzp1.open();
-        e.preventDefault();
-    }
-
-    function updateTotalAmount() {
-        var selectedCells = document.querySelectorAll('.reservation-checkbox:checked');
-        var totalAmountSpan = document.querySelector('.total-amount');
-
-        var totalAmount = 0;
-        selectedCells.forEach(function(checkbox) {
-            var row = checkbox.closest('tr');
-            var priceCell = row.querySelector('.font-weight-bold.text-danger.font-italic.fs-5');
-            totalAmount += parseFloat(priceCell.textContent);
-        });
-
-        totalAmountSpan.textContent = "Total Amount: $" + totalAmount.toFixed(2);
-    }
-
-    // Attach event listener to checkboxes
-    var checkboxes = document.querySelectorAll('.reservation-checkbox');
-    checkboxes.forEach(function(checkbox) {
-        checkbox.addEventListener('change', updateTotalAmount);
-    });
+   var options = {
+       "key": "rzp_test_mEBXoRn25vFX8a",
+       "amount": "{{ razoramount }}",
+       "currency": "INR",
+       "name": "{{ request.user }}",
+       "description": "Turf Booking",
+       "order_id": "{{ order_id }}",
+       "handler": function (response){
+           var selectedReservationIds = [];
+   
+           // Collect all selected reservation IDs
+           var selectedReservationInputFields = document.querySelectorAll('.reservation-checkbox:checked');
+           selectedReservationInputFields.forEach(function(inputField) {
+               selectedReservationIds.push(inputField.value);
+           });
+   
+           // If no reservations are selected, show an alert
+           if (selectedReservationIds.length === 0) {
+               alert("No reservations selected for payment.");
+               return;
+           }
+   
+           var redirectUrl = "{% url 'payment_done' %}" + "?payment_id=" + response.razorpay_payment_id;
+           redirectUrl += "&reservation_ids=" + selectedReservationIds.join(",");
+           window.location.href = redirectUrl;
+       },
+       "theme": {
+           "color": "#3399cc"
+       }
+   };
+   
+   var rzp1 = new Razorpay(options);
+   
+   document.getElementById('rzp-button1').onclick = function(e){
+       // Update the total amount in the Razorpay section based on selected reservations
+       var totalAmount = 0;
+       var selectedCells = document.querySelectorAll('.reservation-checkbox:checked');
+       selectedCells.forEach(function(checkbox) {
+           var row = checkbox.closest('tr');
+           var priceCell = row.querySelector('.font-weight-bold.text-danger.font-italic.fs-5');
+           totalAmount += parseFloat(priceCell.textContent);
+       });
+       options.amount = totalAmount * 100; // Convert to the smallest currency unit (e.g., cents)
+       rzp1 = new Razorpay(options); // Reinitialize Razorpay instance with updated amount
+       rzp1.open();
+       e.preventDefault();
+   }
+   
+   function updateTotalAmount() {
+       var selectedCells = document.querySelectorAll('.reservation-checkbox:checked');
+       var totalAmountSpan = document.querySelector('.total-amount');
+   
+       var totalAmount = 0;
+       selectedCells.forEach(function(checkbox) {
+           var row = checkbox.closest('tr');
+           var priceCell = row.querySelector('.font-weight-bold.text-danger.font-italic.fs-5');
+           totalAmount += parseFloat(priceCell.textContent);
+       });
+   
+       totalAmountSpan.textContent = "Total Amount: $" + totalAmount.toFixed(2);
+   }
+   
+   // Attach event listener to checkboxes
+   var checkboxes = document.querySelectorAll('.reservation-checkbox');
+   checkboxes.forEach(function(checkbox) {
+       checkbox.addEventListener('change', updateTotalAmount);
+   });
 </script>
-
 {% endblock maincontent %}

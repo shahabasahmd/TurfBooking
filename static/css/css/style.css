@@ -336,7 +336,7 @@ body {
     }
     .btn-primary{
     border-radius: 50px;
-    width: 120px;
+    
     }
     .btn-primary:hover{
     background-color: black;
@@ -363,3 +363,10 @@ body {
     transition: 0.3s;
     cursor: pointer;
     }
+    @media (max-width: 850px) {
+        .reservation-item {
+           border: 1px solid #ccc;
+           padding: 10px;
+           margin-bottom: 15px;
+        }
+     }

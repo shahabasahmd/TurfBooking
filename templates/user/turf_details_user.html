@@ -87,10 +87,13 @@
       <div class="row g-4">
          {% for ground in grounds %}
          <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-            <div class="service-item rounded position-relative border border-dark shadow" href="">
-               <span class="position-absolute top-0 end-0 badge bg-danger fw-bold fs-5">{{ ground.price }} / - Per Hour</span>
+            <div class="service-item rounded-3 position-relative border border-dark shadow p-3" href="">
+               <div class="position-absolute top-0 end-0 badge bg-danger fw-bold fs-5 price-badge">{{ ground.price }} /-</div>
                <h3 class="mb-3 text-capitalize">{{ ground.ground_name }}</h3>
-               <a class="btn btn-sm btn-primary rounded py-2 px-4" href="{% url 'available_time_slots' ground_id=ground.id %}"> Book Now </a>
+               <div class="d-flex justify-content-center align-items-center">
+                  <a class="btn btn-sm btn-dark rounded-3 py-3 px-3" href="{% url 'available_time_slots' ground_id=ground.id %}"> Book Now </a>
+
+               </div>
             </div>
          </div>
          {% endfor %}
@@ -99,4 +102,7 @@
 </div>
 
 <!-- Service End -->
+
+
+
 {% endblock maincontent  %}
