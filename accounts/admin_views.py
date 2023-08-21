@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 
 def success_page(request):
-    return render(request,'admin/success_admin.html')
+    return render(request,'admin/admininclude/success_admin.html')
 
 
 @login_required(login_url='/')
@@ -89,8 +89,7 @@ def add_client_save(request):
                     username=username
                 )
 
-            messages.success(request, "Client successfully saved")
-            return redirect('addclient')
+            return redirect('success_page_admin') 
 
 @login_required
 def delete_client(request, id):

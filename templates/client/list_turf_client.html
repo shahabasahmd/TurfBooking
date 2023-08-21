@@ -69,7 +69,7 @@
                             <td class="text-right">
                                <div class="actions">
                                   
-                                 <form method="post" action="">
+                                 <form method="post" action="{% url 'delete_turf_confirmation_page' turf.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm bg-danger-light">
                                         <i class="fas fa-trash"></i>

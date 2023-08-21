@@ -146,3 +146,15 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 RAZOR_KEY_ID = "rzp_test_mEBXoRn25vFX8a"
 RAZOR_KEY_SECRET = "iE5gWZq2PBfRChWw0GOJHZ5O"
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Email settings
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails") 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'shahabas.vellakkattil@gmail.com'
+EMAIL_HOST_PASSWORD = 'shahabas@7560'
+EMAIL_USE_TLS = True

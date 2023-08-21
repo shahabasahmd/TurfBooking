@@ -2,27 +2,28 @@
 {% block tile %}Turf details{% endblock tile %}
 {% block maincontent %}
       
-      <div class="container py-5">
-         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-            <h6 class="section-title text-center text-primary text-uppercase">Our Turf </h6>
-            <h1 class="mb-5">Explore Our <span class="text-primary text-uppercase">Grounds</span></h1>
-         </div>
-         <div class="container">
-            <div class="col">
-                <div class="input-group">
-                    <input type="text" id="searchInput" class="form-control form-control-lg" style="max-width: 900px;" placeholder="Enter your place">
-                    <div class="input-group-append">
-                        <button class="boxed-btn4" type="button" id="searchButton">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
+<div class="container py-5">
+    <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+        <h6 class="section-title text-center text-primary text-uppercase">Our Turf</h6>
+        <h1 class="mb-5">Explore Our <span class="text-primary text-uppercase">Grounds</span></h1>
+    </div>
+    <div class="container">
+        <div class="col">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control form-control-lg" style="max-width: 900px;" placeholder="Enter your place">
+                <div class="input-group-append">
+                    <button class="boxed-btn4" type="button" id="searchButton">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
             </div>
-            <div class="container-xxl py-5">
-                <div class="container">
-                    <div class="row g-4">
-                        {% for t in turfs %}
-                        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s" data-place="{{ t.place | lower }}">
+        </div>
+        <div class="container-xxl py-5">
+            <div class="container">
+                <div class="row g-4">
+                    {% for t in turfs %}
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s" data-place="{{ t.place | lower }}">
+
                      <div class="room-item shadow rounded overflow-hidden">
                         <div class="position-relative">
    
@@ -42,8 +43,9 @@
                                    <div class="d-flex mb-3  ">
                                        <small class="border-end me-3 pe-3">
                                        <i class="fa fa-map-marker-alt text-success me-2"></i>
-                                       <span class="text-muted h5">{{ t.place }}</span>
+                                       <span class="text-muted h5 text-capitalize">{{ t.place }}</span>
                                        </small>
+
                                        <small><i class="fa fa-phone-alt text-secondary me-2"></i>{{t.phone}}</small>
                                    </div>
                                    <div class="d-flex justify-content-between">
@@ -67,37 +69,38 @@
             </div>
          </div>
       </footer>
+      
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
       <script>
-         $(document).ready(function() {
-             // Autocomplete feature
-             $("#searchInput").autocomplete({
-                 source: function(request, response) {
-                     $.getJSON("{% url 'get_places' %}", { q: request.term }, function(data) {
-                         response(data);
-                     });
-                 },
-                 minLength: 1,
-                 delay: 300
-             });
-         
-             $("#searchButton").on("click", function() {
-               var enteredPlace = $("#searchInput").val().trim().toLowerCase();
-       
-               // Loop through all turf elements and filter based on entered place
-               $(".room-item").each(function() {
-                   var turfPlace = $(this).data("place");
-                   if (turfPlace) {
-                       turfPlace = turfPlace.toLowerCase();
-                       if (turfPlace.includes(enteredPlace) || enteredPlace === "") {
-                           $(this).show(); // Show the turf item
-                       } else {
-                           $(this).hide(); // Hide the turf item
-                       }
-                   }
-               });
-           });
-       });
-         </script>
-         
+          $(document).ready(function() {
+              $("#searchInput").autocomplete({
+                  source: "{% url 'get_places' %}",
+                  minLength: 1,
+                  delay: 300,
+                  select: function(event, ui) {
+                      $("#searchInput").val(ui.item.value);
+                      $("#searchButton").trigger("click");
+                      return false;
+                  }
+              });
+      
+              $("#searchButton").on("click", function() {
+                  var enteredPlace = $("#searchInput").val().trim().toLowerCase();
+             
+                  $(".room-item").each(function() {
+                      var turfPlace = $(this).data("place");
+                      if (turfPlace) {
+                          turfPlace = turfPlace.toLowerCase();
+                          if (turfPlace.includes(enteredPlace) || enteredPlace === "") {
+                              $(this).show();
+                          } else {
+                              $(this).hide();
+                          }
+                      }
+                  });
+              });
+          });
+      </script>
     
-{% endblock maincontent  %}
+{% endblock maincontent %}

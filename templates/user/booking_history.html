@@ -1,50 +1,80 @@
 {% extends 'user/user_basefile.html' %}
 {% load static %}
 {% block title %}Booking History{% endblock title %}
-{% block maincontent %}
-<div class=" container-xl">
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card card-table">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover table-center mb-0 datatable">
-                        <thead>
-                            <tr>
-                                <th>Turf Name</th>
-                                <th>Ground Name</th>
-                                <th>Place</th>
-                                <th>Reservation Date</th>
-                                <th>Booked date</th>
-                                <th>Time Slot</th>
-                                <th>Amount Paid</th>
-                                
-                                <!-- Add more fields if needed -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for booking in bookings %}
-                            <tr>
-                                <td>{{ booking.reservation.ground.turf.turf_name }}</td>
-                                <td>{{ booking.reservation.ground.ground_name }}</td>
-                                <td>{{ booking.reservation.ground.turf.place }}</td>
-                                <td>{{ booking.reservation.time_slot.date }}</td>
-                                <td>{{ booking.reservation.reservation_date }}</td>
-                                <td>{{ booking.reservation.time_slot.start_time|time:"P" }} - {{ booking.reservation.time_slot.end_time|time:"P" }}</td>
-                                <td>${{ booking.amount }}</td>
+{% block customstyles %}
+<style>
+   
+    .booking-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+        
+        margin-bottom: 20px;
+        height: auto; /* Set height to auto to accommodate content */
+    }
 
-                                <!-- Add more fields if needed -->
-                            </tr>
-                            {% endfor %}
-                            
-                        </tbody>
-                    </table>
+    .booking-card:hover {
+        transform: translateY(-5px);
+        background-color: aliceblue;
+    }
+
+    .booking-details {
+        padding: 15px;
+    }
+
+    .booking-field {
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    .booking-field strong {
+        display: inline-block;
+        width: 150px;
+        font-weight: bold;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 18px;
+    }
+</style>
+{% endblock customstyles %}
+{% block maincontent %}
+<div class=" container-md mt-5">
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card card-table">
+             <div class="card-header text-white">
+                <h3 class="mb-0 text-secondary font-weight-bold" style="font-family: Playfair Display;"><span class="text-danger font-weight-bold">Reservation Details</span></h3>
+             </div>
+             <div class=" container-sm mt-5">
+                <div class="row">
+                    {% for booking in bookings %}
+                    <div class="col-sm-6">
+                        <div class="card booking-card">
+                            <div class="card-body booking-details-section">
+                                <div class="booking-details">
+                                    <div class="booking-field text-capitalize"><strong class="text-dark">Turf Name</strong> : <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.ground.turf.turf_name }}</span></div>
+                                    <div class="booking-field text-capitalize"><strong class="text-dark">Ground Name</strong> : <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.ground.ground_name }}</span></div>
+                                    <div class="booking-field text-capitalize"><strong class="text-dark">Place</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.ground.turf.place }}</span></div>
+                                    <div class="booking-field text-capitalize"><strong class="text-dark">Reservation Date</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.time_slot.date }}</span></div>
+                                    <div class="booking-field text-capitalize"><strong class="text-dark">Booked Date</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.reservation_date }}</span></div>
+                                    <div class="booking-field text-capitalize"><strong class="text-dark">Time Slot</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.time_slot.start_time|time:"P" }} - {{ booking.reservation.time_slot.end_time|time:"P" }}</span></div>
+                                    <div class="booking-field text-capitalize">
+                                        <strong class="text-dark">Amount Paid:</strong>:
+                                        ₹ <span class="text-danger" style="font-size: 22px; text-decoration: underline;">{{ booking.amount }}</span>
+                                    </div>
+                                    <!-- Add more fields if needed -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if forloop.counter|divisibleby:2 or forloop.last %}
+                </div>
+                <div class="row">
+                    {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>
-
-{% endblock maincontent %} 
-
+{% endblock maincontent %}

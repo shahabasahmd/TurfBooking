@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from .models import *
 from django.http import HttpResponse
 from django.contrib import messages
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
@@ -109,7 +110,6 @@ def timeslot_list_user(request):
 
     return render(request, 'user/list_timeslot_user.html', {'ground': ground, 'timeslots': timeslots, 'selected_date': selected_date})
 
-
 @login_required
 def reserve_timeslots(request):
     if request.method == 'POST':
@@ -141,19 +141,30 @@ def reserve_timeslots(request):
                 # Skip invalid time slot IDs or non-existent time slots
                 continue
 
-            if Reservation.objects.filter(customer=customer, time_slot=time_slot, reservation_date=selected_date).exists():
-                # Skip already reserved time slots
-                continue
+            # Check if the reservation already exists for the user, time slot, and ground
+            existing_reservation = Reservation.objects.filter(
+                customer=customer,
+                time_slot=time_slot,
+                ground=ground,
+                reservation_date=selected_date
+            ).exists()
 
-            reservation = Reservation.objects.create(customer=customer, ground=ground, time_slot=time_slot, reservation_date=selected_date)
-            reservation_details = {
-                'turf_name': ground.turf.turf_name,
-                'ground_name': ground.ground_name,
-                'ground_price': ground.price,
-                'time_slot': f'{time_slot.start_time.strftime("%I:%M %p")} - {time_slot.end_time.strftime("%I:%M %p")}',
-                'reserved_date': selected_date_str,
-            }
-            reservation_details_list.append(reservation_details)
+            if not existing_reservation:
+                # Create reservation if it doesn't already exist
+                reservation = Reservation.objects.create(
+                    customer=customer,
+                    ground=ground,
+                    time_slot=time_slot,
+                    reservation_date=selected_date
+                )
+                reservation_details = {
+                    'turf_name': ground.turf.turf_name,
+                    'ground_name': ground.ground_name,
+                    'ground_price': ground.price,
+                    'time_slot': f'{time_slot.start_time.strftime("%I:%M %p")} - {time_slot.end_time.strftime("%I:%M %p")}',
+                    'reserved_date': selected_date_str,
+                }
+                reservation_details_list.append(reservation_details)
 
         # Pass the reservation details list to the template or success page
         context = {
@@ -316,3 +327,88 @@ def enquiry_view(request):
         return render(request, 'user/home.html')    
 
     return render(request, 'user/home.html')    
+
+
+@login_required
+def profile(request):
+    return render(request, 'user/profile.html')
+
+
+
+from django.contrib.auth import update_session_auth_hash
+
+def change_password(request):
+    if request.method == 'POST':
+        old_password = request.POST['old_password']
+        new_password1 = request.POST['new_password1']
+        new_password2 = request.POST['new_password2']
+
+        if not request.user.check_password(old_password):
+            messages.error(request, 'Incorrect old password. Please try again.')
+        elif new_password1 != new_password2:
+            messages.error(request, 'New passwords do not match. Please try again.')
+        else:
+            request.user.set_password(new_password1)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, 'Your password was successfully changed!')
+            return redirect('profile')  # Update this with the appropriate URL
+    
+    return render(request, 'user/change_password.html')
+
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+
+from .forms import PasswordResetForm
+
+def send_reset_link(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = User.objects.get(email=email)
+
+            # Create a password reset token and send the reset email
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            reset_link = f"http://localhost:8000/reset-password/{uid}/{token}/"  # Adjust port if necessary
+            subject = "Reset Your Password"
+            message = render_to_string('password_reset_email.html', {
+                'user': user,
+                'reset_link': reset_link,
+            })
+            send_mail(subject, message, 'from@example.com', [email])
+
+            return render(request, 'user/forgot_password.html', {'email_sent': True})
+
+    else:
+        form = PasswordResetForm()
+
+    return render(request, 'user/forgot_password.html', {'form': form})
+
+from django.utils.encoding import force_str
+
+from django.contrib.auth.forms import SetPasswordForm
+def reset_password(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            form = SetPasswordForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Your password has been reset successfully.')
+                return redirect('dologin')  # Redirect to the login page after resetting the password
+        else:
+            form = SetPasswordForm(user)
+        return render(request, 'user/reset_password.html', {'form': form})
+    else:
+        messages.error(request, 'The password reset link is invalid or has expired.')
+        return redirect('dologin')

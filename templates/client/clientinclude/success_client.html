@@ -1,4 +1,4 @@
-{% extends 'admin/adminbase.html' %}
+{% extends 'client/clientbase.html' %}
 {% block tile %}add Turf{% endblock tile %}
 {% block customstyles %}
 <style>
@@ -38,7 +38,7 @@
     </div>
     <h1>Success</h1>
     <p>Redirecting to home page in <span id="countdown">5</span> seconds...</p>
-    <a href="{% url 'adminhome' %}" class="btn return-home-button">Return to Home</a>
+    <a href="{% url 'clienthome' %}" class="btn return-home-button">Return to Home</a>
   </div>
 </div>
 

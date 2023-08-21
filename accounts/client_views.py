@@ -8,6 +8,10 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import update_session_auth_hash,authenticate
 from datetime import datetime, timedelta
 
+
+def success_page_client(request):
+    return render(request,'client/clientinclude/success_client.html')
+
 @login_required(login_url='/')
 def clienthome(request ):
     user = request.user
@@ -34,7 +38,7 @@ def change_password_view(request):
             user.save()
             update_session_auth_hash(request, user)  # Update the session to prevent auto logout
             messages.success(request, 'Your password has been changed successfully.')
-            return redirect('change_password')  # Replace 'change_password' with the URL name for this view
+            return redirect('success_page_client')  # Replace 'change_password' with the URL name for this view
         else:
             messages.error(request, 'Invalid current password. Please try again.')
 
@@ -90,7 +94,7 @@ def add_turf_save_client(request):
             shower=shower
         )
         turf.save()
-        return redirect('add_turf_client') 
+        return redirect('success_page_client') 
 
     else:
         return render(request, 'client/addturf_client.html')
@@ -136,7 +140,7 @@ def save_ground_client(request):
         ground.save()
 
         # Redirect to a success page or back to the form page
-        return redirect('success_page')  # Replace 'success_page' with the URL name for your success page
+        return redirect('success_page_client')  # Replace 'success_page' with the URL name for your success page
 
     else:
         # Render the form page
@@ -185,7 +189,7 @@ def delete_turf_confirmation(request, turf_id):
 
     if request.method == 'POST':
         turf.delete()
-        return redirect('client_turf_list')
+        return redirect('client_turf_list')  # Redirect to the turf list page after deletion
     
     return render(request, 'client/delete_turf_confirmation.html', {'turf': turf})
     
@@ -245,7 +249,7 @@ def add_time_slot_client(request):
             start_datetime = datetime.strptime(start_time, '%H:%M')
 
         # Redirect to a success page after successful data submission
-        return redirect('success_page')
+        return redirect('success_page_client')
 
     # If the request method is GET, render the form page
     return render(request, 'client/timeslotpage_client.html', context={})

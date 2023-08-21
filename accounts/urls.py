@@ -3,6 +3,8 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from .import views,admin_views,client_views,users_views
+from django.contrib.auth import views as auth_views
+from .forms import MyPasswordResetform,MySetPasswordForm
 
 
 
@@ -18,7 +20,7 @@ urlpatterns = [
 
     #  end login and logout 
     # this for admin 
-    path("success",admin_views.success_page,name='success_page_admin'),
+    path("success-admin",admin_views.success_page,name='success_page_admin'),
     path("adminhome",admin_views.adminhome,name="adminhome"),
     path('customers-admin/', admin_views.customer_list_admin, name='customer_list_admin'),
     path('delete_customer_admin/<int:customer_id>/', admin_views.delete_customer_admin, name='delete_customer_admin'),
@@ -68,6 +70,7 @@ urlpatterns = [
     
 
     # client section
+    path("success-client",client_views.success_page_client,name='success_page_client'),
     path('clienthome', client_views.clienthome, name='clienthome'),
     path('change-password/', client_views.change_password_view, name='change_password'),
     path('customers-client/', client_views.customer_list_client, name='customer_list_client'),
@@ -75,6 +78,8 @@ urlpatterns = [
     path('addturfclient', client_views.add_turf_client, name='add_turf_client'),
     path('turfsaveclient', client_views.add_turf_save_client, name='save_turf_client'),
     path('client-turf-list', client_views.client_turf_list, name='client_turf_list'),
+    path('delete-turf-confirmation/<int:turf_id>/', client_views.delete_turf_confirmation_page, name='delete_turf_confirmation_page'),
+    path('delete-turf-client/<int:turf_id>/', client_views.delete_turf_confirmation, name='delete_turf_confirmation'),
     path('ground-page-client/', client_views.add_ground_client, name='add_ground_clent_page'),
     path('save_ground_client/', client_views.save_ground_client, name='save_ground_client'),
     path('client/ground-list-by-turf/<int:turf_id>/', client_views.ground_list_by_turf, name='ground_list_by_turf'),
@@ -124,6 +129,14 @@ urlpatterns = [
     path('payment_done/', users_views.payment_done, name='payment_done'),
     path('booking_history/', users_views.booking_history, name='booking_history'),
     path('submit-enquiry/', users_views.enquiry_view, name='enquiry-view'),
+    path('profile/', users_views.profile, name='profile'),
+    path('profile/change_password/', users_views.change_password, name='change_password'),
+
+    path('password-reset/', auth_views.PasswordResetView.as_view(template_name = 'user/password_reset.html',form_class= MyPasswordResetform),name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(template_name = 'user/password_reset_done.html'),name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='user/password_reset_confirm.html', form_class=MySetPasswordForm), name='password_reset_confirm'),
+    path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(template_name = 'user/password_reset_complete.html'),name='password_reset_complete'),
+
 
     
    

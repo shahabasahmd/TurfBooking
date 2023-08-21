@@ -1,0 +1,73 @@
+{% extends 'user/user_basefile.html' %}
+{% load static %}
+{% block tile %}Profile{% endblock tile %}
+
+{% block maincontent %}
+
+      
+<div class="container py-5  ">
+    <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+        <h6 class="section-title text-center text-primary text-uppercase">Your Profile</h6>
+        <h1 class="mb-5">Welcome, {{ user.username }}</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card text-center pt-4">
+                    
+                    <div class="card-body">
+                        <p><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Username:</strong> {{ user.username }}</p>
+                        <p><strong>Mobile:</strong> {{ user.customers.mobile }}</p>
+                        <p><strong>Address:</strong> {{ user.customers.address }}</p>
+                        <!-- Add other profile details here -->
+                    </div>
+                </div>
+            </div>
+    
+            <div class="col-md-6 mt-5">
+                <h2>Change Password</h2>
+                <form method="post" action="{% url 'change_password' %}">
+                    {% csrf_token %}
+                    <div class="form-group mt-3">
+                        <label for="old_password">Old Password:</label>
+                        <input type="password" name="old_password" class="form-control">
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="new_password1">New Password:</label>
+                        <input type="password" name="new_password1" class="form-control">
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="new_password2">Confirm New Password:</label>
+                        <input type="password" name="new_password2" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Change Password</button>
+                </form>
+                {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+            </div>
+            
+
+        </div>
+        <hr>
+        <div class="col-md-6 mt-5">
+            <h2  class=" mt-5">Forgot Password</h2>
+            {% if email_sent %}
+            <div class="alert alert-success" role="alert">
+                Password reset link has been sent to your registered email successfully.
+            </div>
+            {% endif %}
+            <p>If you have forgotten your password, you can request a password reset by clicking below:</p>
+            <a href="{% url 'password_reset' %}" class="btn btn-primary">Forgot Password</a>
+        </div>
+</div>
+
+{% endblock maincontent %}
