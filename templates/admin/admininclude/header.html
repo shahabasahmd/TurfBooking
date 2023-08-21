@@ -20,7 +20,7 @@
         <i class="fas fa-align-left"></i>
         </a>
         <div class="top-nav-search">
-           <h4 class="mt-3"><strong>Welcome</strong> {{user.username}}    </h4>
+           <h4 class="mt-3 text-capitalize"><strong>Welcome</strong> {{user.username}}    </h4>
         </div>
         <a class="mobile_btn" id="mobile_btn">
         <i class="fas fa-bars"></i>
@@ -28,21 +28,8 @@
         <ul class="nav user-menu">
            
            <li class="nav-item dropdown has-arrow">
-            <a class="dropdown-item" href="{% url 'dologout' %}">Logout</a>
-              <div class="dropdown-menu">
-                 <div class="user-header">
-                    <div class="avatar avatar-sm">
-                     
-                    </div>
-                    <div class="user-text">
-                       <h6></h6>
-                       <p class="text-muted mb-0">Administrator</p>
-                    </div>
-                 </div>
-                 <a class="dropdown-item" href="profile.html">My Profile</a>
-                 <a class="dropdown-item" href="inbox.html">Inbox</a>
-                 
-              </div>
+            <a class="btn btn-info text-dark" href="{% url 'dologout' %}">Logout</a>
+              
            </li>
         </ul>
      </div>

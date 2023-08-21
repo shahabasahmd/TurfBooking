@@ -46,29 +46,29 @@ class Customers(models.Model):
     
     def __str__(self):
         return self.user.username
-@receiver(post_save, sender=CustomUser)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        if instance.user_type == 1:
-            MainAdmin.objects.create(admin=instance)
-        elif instance.user_type == 2:
-            address = ""  
-            mobile = ""  
-            Clients.objects.create(admin=instance, address=address, mobile=mobile)
-        elif instance.user_type == 3:
-            Customers.objects.create(admin=instance, address="",mobile="")
+# @receiver(post_save, sender=CustomUser)
+# def create_user_profile(sender, instance, created, **kwargs):
+#     if created:
+#         if instance.user_type == 1:
+#             MainAdmin.objects.create(admin=instance)
+#         elif instance.user_type == 2:
+#             address = ""  
+#             mobile = ""  
+#             Clients.objects.create(admin=instance, address=address, mobile=mobile)
+#         elif instance.user_type == 3:
+#             Customers.objects.create(admin=instance, address="",mobile="")
 
-@receiver(post_save, sender=CustomUser)
-def save_user_profile(sender, instance, **kwargs):
-    if instance.user_type == 1:
-        instance.mainadmin.save()
-    elif instance.user_type == 2:
-        if hasattr(instance, 'clients'):
-            instance.clients.address = instance.clients.address
-            instance.clients.mobile = instance.clients.mobile
-            instance.clients.save()
-    elif instance.user_type == 3:
-        instance.customers.save()
+# @receiver(post_save, sender=CustomUser)
+# def save_user_profile(sender, instance, **kwargs):
+#     if instance.user_type == 1:
+#         instance.mainadmin.save()
+#     elif instance.user_type == 2:
+#         if hasattr(instance, 'clients'):
+#             instance.clients.address = instance.clients.address
+#             instance.clients.mobile = instance.clients.mobile
+#             instance.clients.save()
+#     elif instance.user_type == 3:
+#         instance.customers.save()
 
 
 

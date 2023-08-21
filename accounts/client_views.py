@@ -2,8 +2,6 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from .models import *
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import update_session_auth_hash,authenticate
 from datetime import datetime, timedelta
@@ -148,7 +146,7 @@ def save_ground_client(request):
         return render(request, 'client/add_ground_client.html', {'turfs': turfs})
 
 
-
+@login_required
 def ground_list_by_turf(request, turf_id):
     # Get the list of grounds associated with the selected turf
     grounds = Ground.objects.filter(turf_id=turf_id)
@@ -254,25 +252,31 @@ def add_time_slot_client(request):
     # If the request method is GET, render the form page
     return render(request, 'client/timeslotpage_client.html', context={})
 
+
+
 @login_required
 def turf_list_timeslot(request):
     turf = TurfDetails.objects.filter(added_by=request.user)
     return render(request, 'client/turflist_timeslot_client.html', {'turfs': turf})
 
 
+
+@login_required
 def ground_list(request, turf_id):
     turf = get_object_or_404(TurfDetails, id=turf_id)
     grounds = Ground.objects.filter(turf=turf)
     return render(request, 'client/groundlist_timeslot_client.html', {'turf': turf, 'grounds': grounds})
 
 
+
+@login_required
 def timeslot_list(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     timeslots = TimeSlot.objects.filter(ground=ground)
     return render(request, 'client/list_timeslot_client.html', {'ground': ground, 'timeslots': timeslots})
 
 
-
+@login_required
 def delete_timeslot_client(request, timeslot_id):
     timeslot = get_object_or_404(TimeSlot, pk=timeslot_id)
     ground_id = timeslot.ground.id  # Assuming Timeslot model has a foreign key to the Ground model
@@ -284,10 +288,14 @@ def delete_timeslot_client(request, timeslot_id):
     return render(request, 'client/list_timeslot_client.html', {'timeslot': timeslot})
 
 
+
+
 @login_required
 def turf_list_reservation(request):
     t = TurfDetails.objects.filter(added_by=request.user)
     return render(request, 'client/turflist_reservation_client.html', {'turfs': t})
+
+
 
 @login_required
 def ground_list_reservation(request,turf_id):
@@ -296,6 +304,8 @@ def ground_list_reservation(request,turf_id):
     return render(request, 'client/groundlist_reservation_client.html', {'turf': turf, 'grounds': grounds})
 
 
+
+@login_required
 def select_date_and_reservations(request, ground_id):
     selected_date = request.GET.get('selected_date')
 
@@ -336,16 +346,24 @@ def paymentlist_client(request):
     }
     return render(request, 'client/payment_list_client.html', context)
 
+
+@login_required
 def payment_history(request):
     client_bookings = Bookings.objects.filter(turf_added_by=request.user)
     context = {'client_bookings': client_bookings}
     return render(request, 'client/payment_list_client.html', context)
 
+
+
+@login_required
 def pending_payments(request):
     client_bookings = Bookings.objects.filter(turf_added_by=request.user, payment_status='pending')
     context = {'client_bookings': client_bookings}
     return render(request, 'client/payment_list_client.html', context)
 
+
+
+@login_required
 def completed_payments(request):
     client_bookings = Bookings.objects.filter(turf_added_by=request.user, payment_status='completed')
     context = {'client_bookings': client_bookings}

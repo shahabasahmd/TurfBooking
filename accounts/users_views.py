@@ -5,8 +5,19 @@ from django.contrib import messages
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils.encoding import force_str
+from django.contrib.auth.forms import SetPasswordForm
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from .forms import PasswordResetForm
 
-from django.views.decorators.csrf import csrf_protect
 
 def home(request):
     return render(request,'user/home.html',locals())
@@ -15,9 +26,11 @@ def home(request):
 def about(request):
     return render(request,'user/about.html',locals())
 
+
 def show_register(request):
     return render(request,'register.html')
 
+@login_required
 def add_user_save(request):
     if request.method != "POST":
         return HttpResponse("Method Not Allowed")
@@ -64,7 +77,7 @@ def add_user_save(request):
             return redirect('loginpage')
         
 
-
+@login_required
 def turf_list(request):
     turfs = TurfDetails.objects.all()
     return render(request, 'user/turf_list.html', {'turfs': turfs})
@@ -74,12 +87,15 @@ def get_places(request):
     return JsonResponse(list(places), safe=False)
    
 
+@login_required
 def turf_details_user(request, turf_id):
     turf = get_object_or_404(TurfDetails, id=turf_id)
     grounds = Ground.objects.filter(turf=turf)
     return render(request, 'user/turf_details_user.html', {'turf': turf, 'grounds': grounds})
 
 
+
+@login_required
 def available_time_slots(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     time_slots = TimeSlot.objects.filter(ground=ground)
@@ -90,6 +106,8 @@ def available_time_slots(request, ground_id):
 
 
 
+
+@login_required
 def timeslot_list_user(request):
     selected_date = request.GET.get('selected_date')
     ground_id = request.GET.get('ground_id')
@@ -98,17 +116,18 @@ def timeslot_list_user(request):
         # Convert the selected_date to a Python datetime object
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
 
-        # Get the Ground object based on the ground_id
+       
         ground = get_object_or_404(Ground, id=ground_id)
 
-        # Filter the timeslots based on the selected_date and the related ground
-        # and also filter by is_available
+        
         timeslots = TimeSlot.objects.filter(ground=ground, date=selected_date, is_available=True)
     else:
         ground = None
         timeslots = TimeSlot.objects.none()
 
     return render(request, 'user/list_timeslot_user.html', {'ground': ground, 'timeslots': timeslots, 'selected_date': selected_date})
+
+
 
 @login_required
 def reserve_timeslots(request):
@@ -177,8 +196,7 @@ def reserve_timeslots(request):
 
 
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+
 @login_required
 def reservation_success_user(request):
     customer = Customers.objects.get(admin=request.user)
@@ -242,8 +260,8 @@ def save_payment(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
-from django.db import transaction
 
+@login_required
 def payment_done(request):
     if request.method == 'GET':
         payment_id = request.GET.get('payment_id')
@@ -312,7 +330,7 @@ def booking_history(request):
     return render(request, 'user/booking_history.html', context)
 
 
-from .models import Enquiry
+
 def enquiry_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -335,7 +353,6 @@ def profile(request):
 
 
 
-from django.contrib.auth import update_session_auth_hash
 
 def change_password(request):
     if request.method == 'POST':
@@ -356,13 +373,9 @@ def change_password(request):
     
     return render(request, 'user/change_password.html')
 
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes
 
-from .forms import PasswordResetForm
+
+
 
 def send_reset_link(request):
     if request.method == 'POST':
@@ -389,9 +402,7 @@ def send_reset_link(request):
 
     return render(request, 'user/forgot_password.html', {'form': form})
 
-from django.utils.encoding import force_str
 
-from django.contrib.auth.forms import SetPasswordForm
 def reset_password(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))

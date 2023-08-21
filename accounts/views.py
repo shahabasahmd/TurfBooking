@@ -1,11 +1,8 @@
 from django.shortcuts import render,redirect
-import datetime
 from .models import Customers
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth import login, logout
 from django.shortcuts import render
-from django.urls import reverse
+
 
 from accounts.EmailBackEnd import EmailBackEnd
 

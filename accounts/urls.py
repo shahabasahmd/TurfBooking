@@ -27,7 +27,6 @@ urlpatterns = [
     path("addclient",admin_views.add_client,name="addclient"),
     path("addclientsave",admin_views.add_client_save,name="add_client_save"),
     path("deleteclient/<int:id>",admin_views.delete_client,name="delete_client"),
-
     path('block_client/<int:user_id>/', admin_views.block_client, name='block_client'),
     path('client/blocked_clients/', admin_views.blocked_clients, name='blocked_clients'),
     path('unblock/<int:user_id>/', admin_views.unblock_client, name='unblock_client'),
@@ -37,17 +36,11 @@ urlpatterns = [
     path('ground_details/<int:turf_id>/', admin_views.ground_details_page, name='ground_details_page'),
     path('delete_ground/<int:ground_id>/', admin_views.delete_ground, name='delete_ground_admin'),
     path('save_ground/', admin_views.add_ground_page_admin, name='save_ground_admin'),
-    
     path('list-turf-details/', admin_views.list_turf_details, name='list_turf_details'),
     path('delete-turf/<int:turf_id>/', admin_views.delete_turf_admin, name='delete_turf_admin'),
     path('add_time_slot-page/', admin_views.add_time_slot, name='add_timeslot_page_admin'),
     path('admin/add_time_slot/', admin_views.add_time_slot_admin, name='add_time_slot_admin'),
     path('get-ground-names/<int:turf_id>/', admin_views.get_ground_names, name='get_ground_names'),
-    
-
-
-   
-   
     path('turf-list/', admin_views.turf_list_timeslot, name='turf_list_timeslot'),
     path('turf/<int:turf_id>/grounds/', admin_views.ground_list, name='groundlist_timeslot_admin'),
     path('ground/<int:ground_id>/timeslots/', admin_views.timeslot_list, name='timeslot_list_admin'),
@@ -57,8 +50,6 @@ urlpatterns = [
     path('turf-list-reservation/', admin_views.turf_list_reservation, name='turf_list_reservation_admin'),
     path('turf-reservation/<int:turf_id>/grounds/', admin_views.ground_list_reservation, name='groundlist_reservation_admin'),
     path('admin/select_date_and_reservations/<int:ground_id>/', admin_views.select_date_and_reservations, name='select_date_and_reservations'),
-    # path('client/ground/<int:ground_id>/reservation-details/', admin_views.ground_reservation_details, name='ground_reservation_details'),
-    # path('reservation-list-admin/', admin_views.reservation_list, name='reservation_list_admin'),
     path('admin/bookings/',admin_views.booking_page,name='bookings_page_admin'),
      path('sort-by-turf/', admin_views.sort_by_turf, name='sort-by-turf'),
     path('sort-by-date/', admin_views.sort_by_date, name='sort-by-date'),
@@ -93,9 +84,6 @@ urlpatterns = [
     path('turf-list-reservationclient/', client_views.turf_list_reservation, name='turf_list_reservation_client'),
     path('turf-reservation-client/<int:turf_id>/grounds/', client_views.ground_list_reservation, name='groundlist_reservation_client'),
     path('client/select_date_and_reservations_client/<int:ground_id>/', client_views.select_date_and_reservations, name='select_date_and_reservations_client'),
-    # path('timeslot-list-details/<int:turf_id>/', client_views.timeslot_list_client, name='timeslot_list_client'),
-    # path('timeslot-page-forclient/', client_views.timeslot_page_client, name='timeslot_page_client'),
-    # path('timeslot-list-client/<int:turf_id>/<int:timeslot_id>/delete/', client_views.delete_timeslot_client, name='delete_timeslot_client'),
     path('client/bookings/', client_views.bookings_client, name='client_bookings'),
     path('client/paymentlist/', client_views.paymentlist_client, name='paymentlist_client'),
     path('payment-history/', client_views.payment_history, name='payment-history'),
@@ -118,12 +106,8 @@ urlpatterns = [
     path('get_places/', users_views.get_places, name='get_places'),
     path('turf-details/<int:turf_id>/', users_views.turf_details_user, name='turf_details_user'),
     path('available_time_slots/<int:ground_id>/', users_views.available_time_slots, name='available_time_slots'),
-    #  path('show_time_slots/', users_views.show_time_slot_details, name='show_time_slots'),
-    # path('timeslot-details-user/<int:turf_id>/', users_views.timeslot_details_user, name='timeslot_details_user'),
     path('timeslot-list-user/', users_views.timeslot_list_user, name='timeslot_list_user'),
     path('reserve-timeslots/', users_views.reserve_timeslots, name='reserve_timeslots'),
-
-    # path('reserve_timeslots/', users_views.reserve_timeslots, name='reserve_timeslots'),
     path('reservation-success-user/', users_views.reservation_success_user, name='success_page_user'),
     path('save_payment/', users_views.save_payment, name='save_payment'),
     path('payment_done/', users_views.payment_done, name='payment_done'),
@@ -131,7 +115,6 @@ urlpatterns = [
     path('submit-enquiry/', users_views.enquiry_view, name='enquiry-view'),
     path('profile/', users_views.profile, name='profile'),
     path('profile/change_password/', users_views.change_password, name='change_password'),
-
     path('password-reset/', auth_views.PasswordResetView.as_view(template_name = 'user/password_reset.html',form_class= MyPasswordResetform),name='password_reset'),
     path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(template_name = 'user/password_reset_done.html'),name='password_reset_done'),
     path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='user/password_reset_confirm.html', form_class=MySetPasswordForm), name='password_reset_confirm'),

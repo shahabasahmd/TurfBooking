@@ -98,6 +98,8 @@ def delete_client(request, id):
     messages.success(request, "Selected client deleted successfully")
     return redirect('adminhome')
 
+
+@login_required
 def block_client(request, user_id):
     client = get_object_or_404(CustomUser, id=user_id)
 
@@ -111,6 +113,8 @@ def block_client(request, user_id):
     return redirect('adminhome')
 
 
+
+@login_required
 def unblock_client(request, user_id):
     client = get_object_or_404(CustomUser, id=user_id)
     client.is_blocked = False
@@ -118,7 +122,9 @@ def unblock_client(request, user_id):
     messages.success(request, f"{client.username} has been unblocked.")
     return redirect('adminhome')
 
-    
+
+
+@login_required
 def blocked_clients(request):
     blocked_clients = CustomUser.objects.filter(is_blocked=True)
     context = {
@@ -128,6 +134,8 @@ def blocked_clients(request):
 
 
 
+
+@login_required
 def add_turf(request):
     return render(request,'admin/addturf.html')   
 
@@ -169,17 +177,24 @@ def add_turf_save(request):
     
 
 
+
+
+@login_required
 def list_turf_details(request):
     turfs = TurfDetails.objects.all()
     return render(request, 'admin/list_turf_details.html', {'turfs': turfs})      
 
 
+
+@login_required
 def add_ground_page(request):
     turfs = TurfDetails.objects.all()
     return render(request, 'admin/add_ground_admin.html', {'turfs': turfs})
 
 
 
+
+@login_required
 def add_ground_page_admin(request):
     if request.method == 'POST':
         turf_id = request.POST['turf']
@@ -198,6 +213,10 @@ def add_ground_page_admin(request):
     # If it's not a POST request, render the template as usual
     return render(request, 'admin/add_ground_page_admin.html', {'turfs': TurfDetails.objects.all()})
 
+
+
+
+@login_required
 def ground_details_page(request, turf_id):
     turf = get_object_or_404(TurfDetails, id=turf_id)
     grounds = Ground.objects.filter(turf=turf)
@@ -205,13 +224,15 @@ def ground_details_page(request, turf_id):
     return render(request, 'admin/ground_list_admin.html', {'turf': turf, 'grounds': grounds})
 
 
-
+@login_required
 def delete_ground(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     if request.method == 'POST':
         # Delete the ground object from the database
         ground.delete()
     return redirect('ground_details_page', turf_id=ground.turf.id)
+
+
 
 @login_required
 def delete_turf_admin(request, turf_id):
@@ -299,18 +320,24 @@ def turf_list_timeslot(request):
     return render(request, 'admin/turflist_timeslot_admin.html', {'turfs': t})
 
 
+
+@login_required
 def ground_list(request, turf_id):
     turf = get_object_or_404(TurfDetails, id=turf_id)
     grounds = Ground.objects.filter(turf=turf)
     return render(request, 'admin/groundlist_timeslot_admin.html', {'turf': turf, 'grounds': grounds})
 
 
+
+@login_required
 def timeslot_list(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     timeslots = TimeSlot.objects.filter(ground=ground)
     return render(request, 'admin/list_timeslot_admin.html', {'ground': ground, 'timeslots': timeslots})
 
 
+
+@login_required
 def delete_timeslot_admin(request, timeslot_id):
     timeslot = get_object_or_404(TimeSlot, pk=timeslot_id)
     ground_id = timeslot.ground.id  # Assuming Timeslot model has a foreign key to the Ground model
@@ -321,12 +348,18 @@ def delete_timeslot_admin(request, timeslot_id):
     
     return render(request, 'admin/list_timeslot_admin.html', {'timeslot': timeslot})
 
+
+
+@login_required
 def block_timeslot(request, timeslot_id):
     timeslot = get_object_or_404(TimeSlot, id=timeslot_id)
     timeslot.is_available = False
     timeslot.save()
     return redirect('timeslot_list_admin', ground_id=timeslot.ground.id)
 
+
+
+@login_required
 def unblock_timeslot(request, timeslot_id):
     timeslot = get_object_or_404(TimeSlot, id=timeslot_id)
     timeslot.is_available = True
@@ -339,6 +372,8 @@ def turf_list_reservation(request):
     t = TurfDetails.objects.all()
     return render(request, 'admin/turflist_reservation_admin.html', {'turfs': t})
 
+
+
 @login_required
 def ground_list_reservation(request,turf_id):
     turf = get_object_or_404(TurfDetails, id=turf_id)
@@ -346,6 +381,8 @@ def ground_list_reservation(request,turf_id):
     return render(request, 'admin/groundlist_reservation_admin.html', {'turf': turf, 'grounds': grounds})
 
 
+
+@login_required
 def select_date_and_reservations(request, ground_id):
     selected_date = request.GET.get('selected_date')
 
@@ -364,6 +401,8 @@ def select_date_and_reservations(request, ground_id):
 
 
 
+
+@login_required
 def booking_page(request):
     all_bookings = Bookings.objects.all().order_by('-timestamp')
     
@@ -391,7 +430,7 @@ def sort_by_date(request):
 @login_required
 def payments_admin(request):
     # Get all bookings for rendering in the template
-    all_bookings = Bookings.objects.all()
+    all_bookings = Bookings.objects.all().order_by('-timestamp')
 
     context = {
         'all_bookings': all_bookings,
@@ -400,6 +439,8 @@ def payments_admin(request):
     return render(request, 'admin/paymentspage_admin.html', context)
 
 
+
+@login_required
 def update_payment_status(request):
     if request.method == 'POST':
         booking_id = request.POST.get('booking_id')
@@ -417,11 +458,13 @@ def update_payment_status(request):
         return JsonResponse({'error': 'Invalid request method.'})
     
    
-
+@login_required
 def enquiry_list(request):
     enquiries = Enquiry.objects.all().order_by('-timestamp_enquiry')  # Order by timestamp in descending order
     return render(request, 'admin/enquiry.html', {'enquiries': enquiries})
 
+
+@login_required
 def delete_enquiry(request, pk):
     enquiry = get_object_or_404(Enquiry, pk=pk)
     if request.method == 'POST':
