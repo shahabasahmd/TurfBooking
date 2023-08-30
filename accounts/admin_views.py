@@ -3,11 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
+from django.http import HttpResponse,JsonResponse
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 # from .utils import add_time
 from datetime import datetime, timedelta
+from django.core.paginator import Paginator
 
 
 def success_page(request):
@@ -133,48 +134,85 @@ def blocked_clients(request):
     return render(request, 'admin/blocked_clients.html', context)
 
 
+def add_place(request):
+    if request.method == 'POST':
+        place_name = request.POST['place_name']
+        Places.objects.create(place=place_name)
+
+    # Fetch all places from the database
+    all_places = Places.objects.all()
+
+    # Set the number of places per page
+    places_per_page = 20
+    paginator = Paginator(all_places, places_per_page)
+
+    # Get the current page number from the request's GET parameters
+    page_number = request.GET.get('page')
+    places = paginator.get_page(page_number)
+
+    return render(request, 'admin/addplace.html', {'places': places})
+
+def delete_place(request, place_id):
+    try:
+        place = Places.objects.get(id=place_id)
+        place.delete()
+    except Places.DoesNotExist:
+        # Handle case when the place doesn't exist
+        pass
+    
+    return redirect('add_place')
 
 
 @login_required
 def add_turf(request):
-    return render(request,'admin/addturf.html')   
-
+    places_list = Places.objects.all()  # Get the list of all places
+    context = {
+        'places': places_list
+    }
+    return render(request, 'admin/addturf.html', context)
 
 
 @login_required(login_url='/')
 def add_turf_save(request):
     if request.method == 'POST':
         turf_name = request.POST.get('turf_name')
-        place = request.POST.get('place')
+        place_name = request.POST.get('place')  # Get the place name from the form
         phone = request.POST.get('mobile')
-        cafe = request.POST.get('cafe') == 'cafe_yes'
-        first_aid = request.POST.get('firstaid') == 'firstaid_yes'
-        locker = request.POST.get('locker') == 'locker_yes'
-        parking = request.POST.get('parking') == 'parking_yes'
-        shower = request.POST.get('shower') == 'shower_yes'
+        cafe = request.POST.get('cafe')
+        first_aid = request.POST.get('firstaid')
+        locker = request.POST.get('locker')
+        parking = request.POST.get('parking')
+        shower = request.POST.get('shower')
         image = request.FILES.get('turf_image')
 
-       
-        TurfDetails.objects.create(
-            added_by=request.user,  
-            turf_name=turf_name,
-           
-            place=place,
-            phone=phone,
-            
-            cafe=cafe,
-            first_aid=first_aid,
-            locker=locker,
-            parking=parking,
-            shower=shower,
-            image=image,
-        )
+        # Look up the place by name
+        try:
+            place = Places.objects.get(place=place_name)
+        except Places.DoesNotExist:
+            place = None
 
-        return redirect('success_page_admin') 
+        # Check if place is not null before creating TurfDetails instance
+        if place is not None:
+            turf = TurfDetails.objects.create(
+                added_by=request.user,  
+                turf_name=turf_name,
+                place=place,
+                phone=phone,
+                cafe=(cafe == 'cafe_yes'),
+                first_aid=(first_aid == 'firstaid_yes'),
+                locker=(locker == 'locker_yes'),
+                parking=(parking == 'parking_yes'),
+                shower=(shower == 'shower_yes'),
+                image=image,
+            )
+
+            return redirect('success_page_admin') 
+        else:
+            messages.error(request, 'Invalid place name. Please select a valid place.')
+            return render(request, 'admin/addturf.html')
 
     else:
         return render(request, 'admin/addturf.html')
-    
 
 
 
@@ -333,7 +371,15 @@ def ground_list(request, turf_id):
 def timeslot_list(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     timeslots = TimeSlot.objects.filter(ground=ground)
-    return render(request, 'admin/list_timeslot_admin.html', {'ground': ground, 'timeslots': timeslots})
+    
+    # Number of items to display per page
+    items_per_page = 20
+    
+    paginator = Paginator(timeslots, items_per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'admin/list_timeslot_admin.html', {'ground': ground, 'page_obj': page_obj})
 
 
 
@@ -439,7 +485,6 @@ def payments_admin(request):
     return render(request, 'admin/paymentspage_admin.html', context)
 
 
-
 @login_required
 def update_payment_status(request):
     if request.method == 'POST':
@@ -456,7 +501,6 @@ def update_payment_status(request):
             return JsonResponse({'error': 'Booking not found.'})
     else:
         return JsonResponse({'error': 'Invalid request method.'})
-    
    
 @login_required
 def enquiry_list(request):

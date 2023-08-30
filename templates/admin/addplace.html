@@ -1,0 +1,155 @@
+{% extends 'admin/adminbase.html' %}
+{% block tile %}add place{% endblock tile %}
+{% block maincontent %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" action="{% url 'add_place' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="form-title"><span>Basic Details</span></h5>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <div class="form-group">
+                                <label>Place Name</label>
+                                <input type="text" class="form-control" name="place_name" required>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">List of Places</h5>
+                <div class="container" style="max-width: 800px;">
+                    <div class="form-group">
+                        <label for="search">Search Place Name:</label>
+                        <input type="text" class="form-control" id="search" placeholder="Search...">
+                        <div id="suggestions"></div>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th colspan="2">Place Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for place in places %}
+                                <tr id="row_{{ place.id }}" data-row-number="{{ forloop.counter0 }}">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ place.place }}</td>
+                                    <td class="text-right">
+                                        <div class="actions">
+                                            <form method="post" action="{% url 'delete_place' place.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete <i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if places.has_previous %}
+                            <a href="?page=1">&laquo; first</a>
+                            <a href="?page={{ places.previous_page_number }}">previous</a>
+                        {% endif %}
+                        <span class="current">
+                            Page {{ places.number }} of {{ places.paginator.num_pages }}.
+                        </span>
+                        {% if places.has_next %}
+                            <a href="?page={{ places.next_page_number }}">next</a>
+                            <a href="?page={{ places.paginator.num_pages }}">last &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('search');
+    const suggestionsContainer = document.getElementById('suggestions');
+
+    searchInput.addEventListener('input', function () {
+        const userInput = searchInput.value;
+
+        // Clear existing suggestions
+        suggestionsContainer.innerHTML = '';
+
+        // Send AJAX request to fetch suggestions
+        fetch(`/path/to/suggestions/?search=${userInput}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update suggestions list
+                data.forEach(suggestion => {
+                    const suggestionElement = document.createElement('div');
+                    suggestionElement.textContent = suggestion.place_name;
+                    suggestionElement.classList.add('suggestion'); // Add this line
+                    suggestionsContainer.appendChild(suggestionElement);
+                });
+            })
+            .catch(error => console.error('Error fetching suggestions:', error));
+    });
+
+    // Add event listener to suggestions for clicking and filling the search input
+    suggestionsContainer.addEventListener('click', function (event) {
+        if (event.target.classList.contains('suggestion')) {
+            searchInput.value = event.target.textContent;
+            suggestionsContainer.innerHTML = ''; // Clear suggestions after selecting
+        }
+    });
+
+    
+    // ... Your existing JavaScript code ...
+    suggestionsContainer.addEventListener('click', function (event) {
+        // ... Your existing code ...
+
+        if (event.target.tagName === 'BUTTON' && event.target.classList.contains('btn-danger')) {
+            const row = event.target.closest('tr');
+            const rowId = row.getAttribute('id');
+            const rowNumber = parseInt(row.getAttribute('data-row-number'));
+
+            // Send AJAX request to delete the place
+            fetch(event.target.closest('form').getAttribute('action'), { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove the deleted row from the table
+                    if (data.deleted) {
+                        row.remove();
+
+                        // Update remaining row numbers and IDs
+                        document.querySelectorAll('tbody tr').forEach((remainingRow, index) => {
+                            const remainingRowId = remainingRow.getAttribute('id');
+                            const remainingRowNumber = parseInt(remainingRow.getAttribute('data-row-number'));
+                            if (remainingRowNumber > rowNumber) {
+                                remainingRow.setAttribute('id', `row_${remainingRowNumber - 1}`);
+                                remainingRow.setAttribute('data-row-number', remainingRowNumber - 1);
+                                remainingRow.querySelector('td:first-child').textContent = index + 1;
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error('Error deleting place:', error));
+        }
+    });
+</script>
+{% endblock maincontent %}

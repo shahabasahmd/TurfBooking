@@ -54,9 +54,9 @@
                                 <div class="booking-details">
                                     <div class="booking-field text-capitalize"><strong class="text-dark">Turf Name</strong> : <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.ground.turf.turf_name }}</span></div>
                                     <div class="booking-field text-capitalize"><strong class="text-dark">Ground Name</strong> : <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.ground.ground_name }}</span></div>
-                                    <div class="booking-field text-capitalize"><strong class="text-dark">Place</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.ground.turf.place }}</span></div>
+                                    <div class="booking-field text-capitalize"><strong class="text-dark">Place</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.ground.turf.place.place }}</span></div>
                                     <div class="booking-field text-capitalize"><strong class="text-dark">Reservation Date</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.time_slot.date }}</span></div>
-                                    <div class="booking-field text-capitalize"><strong class="text-dark">Booked Date</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.reservation_date }}</span></div>
+                                    <div class="booking-field text-capitalize"><strong class="text-dark">Booked Date</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.timestamp|date:"F d, Y h:i A" }}</span></div>
                                     <div class="booking-field text-capitalize"><strong class="text-dark">Time Slot</strong>: <span class="text-success" style="text-decoration: underline;">{{ booking.reservation.time_slot.start_time|time:"P" }} - {{ booking.reservation.time_slot.end_time|time:"P" }}</span></div>
                                     <div class="booking-field text-capitalize">
                                         <strong class="text-dark">Amount Paid:</strong>:

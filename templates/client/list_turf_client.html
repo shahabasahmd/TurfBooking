@@ -53,7 +53,7 @@
                          <tr>
                             <td>{{ forloop.counter }}</td>
                             <td><a href="{% url 'ground_list_by_turf' turf.id %}">{{ turf.turf_name }}</a></td>
-                            <td>{{turf.place}}</td>
+                            <td>{{ turf.place.place }}</td>
                             
                             
                             <td>{{turf.added_by }}</td>

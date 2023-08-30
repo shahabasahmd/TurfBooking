@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .forms import PasswordResetForm
+from django.contrib.auth import login
 
 
 def home(request):
@@ -30,11 +31,8 @@ def about(request):
 def show_register(request):
     return render(request,'register.html')
 
-@login_required
 def add_user_save(request):
-    if request.method != "POST":
-        return HttpResponse("Method Not Allowed")
-    else:
+    if request.method == "POST":
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         username = request.POST.get("username")
@@ -44,11 +42,11 @@ def add_user_save(request):
         mobile = request.POST.get("phone")
 
         if CustomUser.objects.filter(email=email).exists():
-            messages.warning(request, "Email already taken")
-            return redirect('showregisterpage')
+            return HttpResponse("Email already taken", status=400)
+            
         elif CustomUser.objects.filter(username=username).exists():
-            messages.warning(request, "Username already taken")
-            return redirect('showregisterpage')
+            return HttpResponse("Username already taken", status=400)
+            
         else:
             user = CustomUser.objects.create_user(
                 first_name=first_name,
@@ -59,32 +57,33 @@ def add_user_save(request):
                 user_type=3
             )
 
-            # Check if a Clients instance already exists for the given admin user
-            customers = Customers.objects.filter(admin=user).first()
-            if customers:
+            # Check if a Customers object exists for the admin
+            customers, created = Customers.objects.get_or_create(admin=user)
+            if not created:
+                # Update the existing Customers object
                 customers.address = address
                 customers.mobile = mobile
                 customers.save()
             else:
-                customers = Customers.objects.create(
-                    admin=user,
-                    address=address,
-                    mobile=mobile,
-                    username=username
-                )
+                # Set mobile and address for the new Customers object
+                customers.mobile = mobile
+                customers.address = address
+                customers.save()
 
-            messages.success(request, "your account created successfuly")
-            return redirect('loginpage')
-        
+            # Log the user in
+            login(request, user)
 
+            messages.success(request, "Your account was created successfully")
+            return redirect('loginpage')  # Redirect to the appropriate page
+
+    # If the request method is not "POST", you can render the registration page
+    return render(request, 'registration/register.html')
 @login_required
 def turf_list(request):
-    turfs = TurfDetails.objects.all()
+    user_selected_place = request.GET.get('place')  # Get the selected place from the query parameter
+    turfs = TurfDetails.objects.filter(place__place=user_selected_place) if user_selected_place else TurfDetails.objects.all()
     return render(request, 'user/turf_list.html', {'turfs': turfs})
-def get_places(request):
-    search_query = request.GET.get('q', '')
-    places = TurfDetails.objects.filter(place__icontains=search_query).values_list('place', flat=True).distinct()
-    return JsonResponse(list(places), safe=False)
+
    
 
 @login_required
@@ -150,7 +149,21 @@ def reserve_timeslots(request):
             return HttpResponse("error") 
 
         reservation_details_list = []
-        selected_date = datetime.strptime(selected_date_str, '%b. %d, %Y').strftime('%Y-%m-%d')
+
+        # List of possible date formats to try
+        date_formats = ['%b. %d, %Y', '%B %d, %Y']
+
+        selected_date = None
+        for date_format in date_formats:
+            try:
+                selected_date = datetime.strptime(selected_date_str.replace('Sept', 'Sep'), date_format).strftime('%Y-%m-%d')
+                break  # Break out of the loop if a valid format is found
+            except ValueError as e:
+                print(f"Error parsing date with format {date_format}: {e}")
+                pass  # Try the next format
+        
+        if selected_date is None:
+            return HttpResponse("Invalid date format")
 
         for time_slot_id_str in delete_checkbox_values:
             try:
@@ -160,7 +173,6 @@ def reserve_timeslots(request):
                 # Skip invalid time slot IDs or non-existent time slots
                 continue
 
-            # Check if the reservation already exists for the user, time slot, and ground
             existing_reservation = Reservation.objects.filter(
                 customer=customer,
                 time_slot=time_slot,
@@ -169,7 +181,6 @@ def reserve_timeslots(request):
             ).exists()
 
             if not existing_reservation:
-                # Create reservation if it doesn't already exist
                 reservation = Reservation.objects.create(
                     customer=customer,
                     ground=ground,
@@ -185,15 +196,12 @@ def reserve_timeslots(request):
                 }
                 reservation_details_list.append(reservation_details)
 
-        # Pass the reservation details list to the template or success page
         context = {
             'reservation_details_list': reservation_details_list,
         }
         return redirect('success_page_user') 
 
     return render(request, 'user/list_timeslot_user.html')
-
-
 
 
 

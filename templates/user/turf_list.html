@@ -1,5 +1,19 @@
 {% extends 'user/user_basefile.html' %}
 {% block tile %}Turf details{% endblock tile %}
+{% block customstyles %}
+
+<style>
+    /* Customize the search button's height */
+    .custom-search-button {
+        height: 48px; /* Adjust the height as needed */
+    }
+
+    /* Remove bullets (dots) from datalist options */
+    datalist option {
+        list-style: none;
+    }
+</style>
+{% endblock customstyles %}
 {% block maincontent %}
       
 <div class="container py-5">
@@ -10,19 +24,23 @@
     <div class="container">
         <div class="col">
             <div class="input-group">
-                <input type="text" id="searchInput" class="form-control form-control-lg" style="max-width: 900px;" placeholder="Enter your place">
-                <div class="input-group-append">
-                    <button class="boxed-btn4" type="button" id="searchButton">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
+                <!-- Use <datalist> element for place suggestions -->
+                    <input list="places" id="placeInput" class="form-control form-control-lg" style="max-width: 900px;" placeholder="Enter your place">
+                    <datalist id="places">
+                        {% for t in turfs %}
+                            <option value="{{ t.place.place }}">{{ t.place.place }}</option>
+                        {% endfor %}
+                    </datalist>
+                <button class="boxed-btn4 custom-search-button" type="button" id="searchButton">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </div>
         <div class="container-xxl py-5">
             <div class="container">
                 <div class="row g-4">
                     {% for t in turfs %}
-                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s" data-place="{{ t.place | lower }}">
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s" data-place="{{ t.place.place | lower }}">
 
                      <div class="room-item shadow rounded overflow-hidden">
                         <div class="position-relative">
@@ -43,7 +61,7 @@
                                    <div class="d-flex mb-3  ">
                                        <small class="border-end me-3 pe-3">
                                        <i class="fa fa-map-marker-alt text-success me-2"></i>
-                                       <span class="text-muted h5 text-capitalize">{{ t.place }}</span>
+                                       <span class="text-muted h5 text-capitalize">{{ t.place.place }}</span>
                                        </small>
 
                                        <small><i class="fa fa-phone-alt text-secondary me-2"></i>{{t.phone}}</small>
@@ -70,37 +88,26 @@
          </div>
       </footer>
       
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-      <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.2/awesomplete.min.js"></script>
       <script>
-          $(document).ready(function() {
-              $("#searchInput").autocomplete({
-                  source: "{% url 'get_places' %}",
-                  minLength: 1,
-                  delay: 300,
-                  select: function(event, ui) {
-                      $("#searchInput").val(ui.item.value);
-                      $("#searchButton").trigger("click");
-                      return false;
-                  }
-              });
-      
-              $("#searchButton").on("click", function() {
-                  var enteredPlace = $("#searchInput").val().trim().toLowerCase();
-             
-                  $(".room-item").each(function() {
-                      var turfPlace = $(this).data("place");
-                      if (turfPlace) {
-                          turfPlace = turfPlace.toLowerCase();
-                          if (turfPlace.includes(enteredPlace) || enteredPlace === "") {
-                              $(this).show();
-                          } else {
-                              $(this).hide();
-                          }
-                      }
-                  });
-              });
-          });
-      </script>
+        var places = [
+            {% for t in turfs %}
+                "{{ t.place.place }}",
+            {% endfor %}
+        ];
+    
+        var placeInput = document.getElementById("placeInput");
+        new Awesomplete(placeInput, {
+            list: places,
+            minChars: 1,
+        });
+    
+        var searchButton = document.getElementById("searchButton");
+        searchButton.addEventListener("click", function() {
+            var selectedPlace = placeInput.value.toLowerCase();
+            // Pass the selected place as a query parameter to the URL
+            window.location.href = "{% url 'turf_list_user' %}?place=" + encodeURIComponent(selectedPlace);
+        });
+    </script>
     
 {% endblock maincontent %}

@@ -5,8 +5,9 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import update_session_auth_hash,authenticate
 from datetime import datetime, timedelta
+from django.core.paginator import Paginator
 
-
+@login_required
 def success_page_client(request):
     return render(request,'client/clientinclude/success_client.html')
 
@@ -63,35 +64,60 @@ def delete_customer_client(request, customer_id):
 @login_required
 def add_turf_client(request):
     return render(request,'client/addturf_client.html')
+
+
+@login_required
+def add_place_client(request):
+    if request.method == 'POST':
+        place_name = request.POST['place_name']
+        Places.objects.create(place=place_name)
+
+    # Fetch all places from the database
+    all_places = Places.objects.all()
+
+    # Set the number of places per page
+    places_per_page = 20
+    paginator = Paginator(all_places, places_per_page)
+
+    # Get the current page number from the request's GET parameters
+    page_number = request.GET.get('page')
+    places = paginator.get_page(page_number)
+
+    return render(request, 'client/addplace_client.html', {'places': places})
   
 @login_required
 def add_turf_save_client(request):
     if request.method == 'POST':
         turf_name = request.POST.get('turf_name')
-        place = request.POST.get('place')
+        place_name = request.POST.get('place')  # Get the place name from the form
         phone = request.POST.get('mobile')
-        cafe = request.POST.get('cafe') == 'cafe_yes'
-        first_aid = request.POST.get('firstaid') == 'firstaid_yes'
-        locker = request.POST.get('locker') == 'locker_yes'
-        parking = request.POST.get('parking') == 'parking_yes'
-        shower = request.POST.get('shower') == 'shower_yes'
+        cafe = request.POST.get('cafe')
+        first_aid = request.POST.get('firstaid')
+        locker = request.POST.get('locker')
+        parking = request.POST.get('parking')
+        shower = request.POST.get('shower')
         image = request.FILES.get('turf_image')
 
-        added_by = request.user
-        #Create a new Turf object and save the data
-        turf = TurfDetails(
-            added_by=added_by,
-            image=image,
-            turf_name=turf_name,
-            place=place,
-            phone=phone,
-            cafe=cafe,
-            first_aid=first_aid,
-            locker=locker,
-            parking=parking,
-            shower=shower
-        )
-        turf.save()
+        # Look up the place by name
+        try:
+            place = Places.objects.get(place=place_name)
+        except Places.DoesNotExist:
+            place = None
+
+        # Check if place is not null before creating TurfDetails instance
+        if place is not None:
+            turf = TurfDetails.objects.create(
+                added_by=request.user,  
+                turf_name=turf_name,
+                place=place,
+                phone=phone,
+                cafe=(cafe == 'cafe_yes'),
+                first_aid=(first_aid == 'firstaid_yes'),
+                locker=(locker == 'locker_yes'),
+                parking=(parking == 'parking_yes'),
+                shower=(shower == 'shower_yes'),
+                image=image,
+            )
         return redirect('success_page_client') 
 
     else:
@@ -272,7 +298,20 @@ def ground_list(request, turf_id):
 @login_required
 def timeslot_list(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
-    timeslots = TimeSlot.objects.filter(ground=ground)
+    all_timeslots = TimeSlot.objects.filter(ground=ground)
+    
+    # Set the number of items to display per page
+    items_per_page = 20
+    
+    # Create a Paginator object
+    paginator = Paginator(all_timeslots, items_per_page)
+    
+    # Get the requested page number from the URL parameter
+    page_number = request.GET.get('page')
+    
+    # Get the Page object for the requested page number
+    timeslots = paginator.get_page(page_number)
+    
     return render(request, 'client/list_timeslot_client.html', {'ground': ground, 'timeslots': timeslots})
 
 

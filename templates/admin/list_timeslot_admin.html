@@ -1,86 +1,93 @@
 {% extends 'admin/adminbase.html' %}
-{% block tile %}Lsit Turf Details{% endblock tile %}
+{% block tile %}List Turf Details{% endblock tile %}
 {% block maincontent %}
 
- <div class="content container-fluid">
+<div class="content container-fluid">
     <div class="page-header">
-       <div class="row align-items-center">
-          <div class="col">
-             <h3 class="page-title">Time Slot</h3>
-             <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                <li class="breadcrumb-item active">Time Slot</li>
-             </ul>
-          </div>
-          <div class="col-auto text-right float-right ml-auto">
-             <a href="{% url 'add_timeslot_page_admin' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add TimeSlot Details </a>
-             
-          </div>
-       </div>
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Time Slot</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Time Slot</li>
+                </ul>
+            </div>
+            <div class="col-auto text-right float-right ml-auto">
+                <a href="{% url 'add_timeslot_page_admin' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add TimeSlot Details </a>
+            </div>
+        </div>
     </div>
     <div class="row">
-       <div class="col-sm-12">
-          <div class="card card-table">
-             <div class="card-body">
-                <div class="table-responsive">
-                   <table class="table table-hover table-center mb-0 datatable">
-                      <thead>
-                           <tr>
-                            <th>No</th>
-                            
-                            <th>Date</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Action</th>
-                            <th>Block the slot </th>
-                           </tr>
-                      </thead>
-                        <tbody>
-                           {% if timeslots %}
-                           {% for timeslot in timeslots %}
-                         <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td> {{ timeslot.date }}</td>
-                            <td>{{ timeslot.start_time }}</td>
-                            <td>{{ timeslot.end_time }}</td>
-                            
-                            <td class="text-right">
-                               <div class="actions">
-                                 <form method="post" action="{% url 'delete_timeslot_admin' timeslot_id=timeslot.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete <i class="fas fa-trash"></i></button>
-                                </form>
-                                  
-                               </div>
-                            </td>
-                            <td class="text-right">
-                              <div class="actions">
-                                  <form method="post" action="{% url 'block_timeslot_admin' timeslot_id=timeslot.id %}">
-                                      {% csrf_token %}
-                                      {% if  timeslot.is_available %}
-                                          <button type="submit" class="btn btn-danger btn-sm">Block</button>
-                                      {% else %}
-                                          <button type="submit" class="btn btn-success btn-sm">Cancel Booking</button>
-                                      {% endif %}
-                                  </form>
-                              </div>
-                          </td>
-
-                         </tr>
-                         {% endfor %}
-                         {% else %}
-                                <p>No Timeslot details found </p>
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-center mb-0 datatable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Action</th>
+                                    <th>Block the slot</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if page_obj %}
+                                {% for timeslot in page_obj %}
+                                <tr>
+                                    <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>
+                                    <td>{{ timeslot.date }}</td>
+                                    <td>{{ timeslot.start_time }}</td>
+                                    <td>{{ timeslot.end_time }}</td>
+                                    <td class="text-right">
+                                        <div class="actions">
+                                            <form method="post" action="{% url 'delete_timeslot_admin' timeslot_id=timeslot.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete <i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="actions">
+                                            <form method="post" action="{% url 'block_timeslot_admin' timeslot_id=timeslot.id %}">
+                                                {% csrf_token %}
+                                                {% if timeslot.is_available %}
+                                                <button type="submit" class="btn btn-danger btn-sm">Block</button>
+                                                {% else %}
+                                                <button type="submit" class="btn btn-success btn-sm">Cancel Booking</button>
+                                                {% endif %}
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="6">No Timeslot details found</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination justify-content-center mt-4">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
                             {% endif %}
-
-                        </tbody>
-                   </table>
+                            <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                            {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
                 </div>
-             </div>
-          </div>
-       </div>
+            </div>
+        </div>
     </div>
- </div> 
-
- 
+</div>
 
 {% endblock maincontent %}

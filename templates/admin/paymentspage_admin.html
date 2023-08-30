@@ -7,14 +7,14 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <div class="col-auto text-right float-right ml-auto">
     <div class="btn-group">
-    <select id="sort-by-select" class="form-control">
-        <option value="turf">Sort by Turf</option>
-        <option value="date">Sort by Date</option>
-    </select>
+        <select id="sort-by-select" class="form-control">
+            <option value="turf">Sort by Turf</option>
+            <option value="date">Sort by Date</option>
+        </select>
     </div>
 </div>
 <div class="content container-fluid">
-    <h2>payment History</h2>
+    <h2>Payment History</h2>
     
     <div class="row">
         <div class="col-sm-12">
@@ -40,7 +40,7 @@
                                 {% for booking in all_bookings %}
                                 <tr>
                                     <td>{{ booking.customer.admin.username }}</td>
-                                    <td>{{ booking.reservation.ground.turf.added_by }}</td>
+                                    <td>{{ booking.reservation.ground.turf.added_by.username }}</td>
                                     <td>{{ booking.reservation.ground.turf.turf_name }}</td>
                                     <td>{{ booking.reservation.ground.ground_name }}</td>
                                     <td>{{ booking.reservation.time_slot.date }}</td>
@@ -51,7 +51,7 @@
                                     <td>{{ booking.razorpay_payment_id }}</td>
                                     <td>{{ booking.amount }}</td>
                                     <td>
-                                        <select name="payment_status" id="payment_status" class="form-control {% if booking.payment_status == 'pending' %}text-danger{% endif %} {% if booking.payment_status == 'completed' %}text-success{% endif %}" onchange="updatePaymentStatus('{{ booking.id }}', this.value)">
+                                        <select name="payment_status" id="payment_status_{{ booking.id }}" class="form-control payment-status-select" data-booking-id="{{ booking.id }}">
                                             {% for status_value, status_label in booking.PAYMENT_CHOICES %}
                                                 <option value="{{ status_value }}" {% if booking.payment_status == status_value %}selected{% endif %}>{{ status_label }}</option>
                                             {% endfor %}
@@ -70,17 +70,10 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('#sort-by-turf').click(function() {
-            window.location.href = '{% url "sort-by-turf" %}';
-        });
+        $('.payment-status-select').change(function() {
+            var bookingId = $(this).data('booking-id');
+            var newStatus = $(this).val();
 
-        $('#sort-by-date').click(function() {
-            window.location.href = '{% url "sort-by-date" %}';
-        });
-    });
-
-    
-        function updatePaymentStatus(bookingId, newStatus) {
             $.ajax({
                 type: 'POST',
                 url: '{% url "update-payment-status" %}',
@@ -91,12 +84,18 @@
                 },
                 success: function(data) {
                     // Handle success response, if needed
+                    if (data.message) {
+                        console.log(data.message);
+                    }
                 },
                 error: function(data) {
                     // Handle error response, if needed
+                    if (data.error) {
+                        console.error(data.error);
+                    }
                 }
             });
-        }
-   
+        });
+    });
 </script>
 {% endblock maincontent %}

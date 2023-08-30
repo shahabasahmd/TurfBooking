@@ -11,6 +11,10 @@
                 <li class="breadcrumb-item active">Add Turf Details</li>
              </ul>
           </div>
+          <div class="col-auto text-right float-right ml-auto">
+            <a href="{% url 'add_place_client' %}" class="btn btn-outline-primary mr-2"><i class="fas fa-plus"></i> Add place </a>
+            
+         </div>
        </div>
     </div>
     <div class="row">
@@ -39,9 +43,14 @@
                       <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label>Place</label>
-                            <input type="text" class="form-control" name="place" required>
+                            <input list="places" class="form-control" name="place" required>
+                            <datalist id="places">
+                                {% for place_obj in places %}
+                                    <option value="{{ place_obj.place }}">
+                                {% endfor %}
+                            </datalist>
                         </div>
-                      </div> 
+                    </div>
                       <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label>Mobile number</label>

@@ -70,13 +70,14 @@ class Customers(models.Model):
 #     elif instance.user_type == 3:
 #         instance.customers.save()
 
-
+class Places(models.Model):
+    place=models.CharField(max_length = 100, null=True)
 
 class TurfDetails(models.Model):
     
     turf_name = models.CharField(max_length = 100, null=True)
     added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='uploaded_turfs')
-    place = models.CharField(max_length = 150, null=True)
+    place = models.ForeignKey(Places, on_delete=models.CASCADE, null=True)
     phone = models.CharField(max_length=15,null=True,default=0) 
     image = models.ImageField(upload_to='turf_images/', null=True, blank=True)
     cafe = models.BooleanField(default=False, null=True)
