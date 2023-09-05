@@ -33,6 +33,7 @@
                                     <th>Email</th>
                                     <th>Mobile Number</th>
                                     <th>Address</th>
+                                    <th>Commission % Per Booking </th>
                                     <th>Delete / Block</th>
                                 </tr>
                             </thead>
@@ -48,6 +49,7 @@
                                     <td>{{ i.admin.email }}</td>
                                     <td>{{ i.mobile }}</td>
                                     <td>{{ i.address }}</td>
+                                    <td>{{ i.commission_percentage }}</td>
                                     <td class="text-right">
                                         <div class="actions">
                                             <a href="{% url 'delete_client' i.admin.id  %}" class="btn btn-sm bg-danger-light">

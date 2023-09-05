@@ -66,24 +66,7 @@ def add_turf_client(request):
     return render(request,'client/addturf_client.html')
 
 
-@login_required
-def add_place_client(request):
-    if request.method == 'POST':
-        place_name = request.POST['place_name']
-        Places.objects.create(place=place_name)
 
-    # Fetch all places from the database
-    all_places = Places.objects.all()
-
-    # Set the number of places per page
-    places_per_page = 20
-    paginator = Paginator(all_places, places_per_page)
-
-    # Get the current page number from the request's GET parameters
-    page_number = request.GET.get('page')
-    places = paginator.get_page(page_number)
-
-    return render(request, 'client/addplace_client.html', {'places': places})
   
 @login_required
 def add_turf_save_client(request):
@@ -378,7 +361,15 @@ def bookings_client(request):
 @login_required
 def paymentlist_client(request):
     logged_in_client = request.user  # Assuming the logged-in user is a CustomUser
+    client = Clients.objects.get(admin=logged_in_client)  # Get the client object associated with the logged-in user
     client_bookings = Bookings.objects.filter(turf_added_by=logged_in_client)
+    
+    # Calculate the client's amount for each booking
+    for booking in client_bookings:
+        commission_percentage = client.commission_percentage
+        commission = (commission_percentage / 100) * booking.amount
+        amount_to_client = booking.amount - commission
+        booking.amount_to_client = amount_to_client
     
     context = {
         'client_bookings': client_bookings,

@@ -9,10 +9,68 @@ from django.shortcuts import get_object_or_404
 # from .utils import add_time
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
+from django.db.models import Sum
 
 
 def success_page(request):
     return render(request,'admin/admininclude/success_admin.html')
+
+
+
+
+
+from django.db.models.functions import ExtractMonth
+@login_required
+def dashboard(request):
+    # Get the count of customer records
+    customer_count = Customers.objects.count()
+    clients_count = Clients.objects.count()
+    grounds_count = Ground.objects.count()
+
+    # Calculate the total booking amount listed by the admin
+    total_booking_amount = Bookings.objects.filter(turf_added_by=request.user).aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # Calculate the total commission earned by the admin
+    total_commission = Bookings.objects.aggregate(Sum('commission'))['commission__sum'] or 0
+
+    # Calculate the total profit as the sum of booking amount and commission
+    total_profit = total_booking_amount + total_commission
+
+    # Query the database to get revenue data
+    revenue_data = Bookings.objects.filter(
+        turf_added_by=request.user,
+        payment_status='completed'
+    ).annotate(
+        month=ExtractMonth('timestamp')
+    ).values('month').annotate(
+        monthly_revenue=Sum('amount')
+    ).order_by('month')
+
+    # Create empty revenue data list with zeros for each month
+    revenue_months = list(range(1, 13))  # Assuming you have 12 months in a year
+    revenue_values = [0] * len(revenue_months)
+
+    # Populate the revenue data list with actual data
+    for item in revenue_data:
+        month_index = item['month'] - 1  # Month 1 will be at index 0
+        revenue_values[month_index] = item['monthly_revenue']
+
+    # Query the database to get booking data (monthly count of bookings)
+    bookings_data = Bookings.objects.annotate(
+        month=ExtractMonth('timestamp')
+    ).values('month').annotate(
+        monthly_bookings=Sum(1)
+    ).order_by('month').values_list('monthly_bookings', flat=True)
+
+    context = {
+        'customer_count': customer_count,
+        'clients_count': clients_count,
+        'grounds_count': grounds_count,
+        'total_profit': total_profit,
+        'revenue_data': list(revenue_data),
+        'bookings_data': list(bookings_data),
+    }
+    return render(request, 'admin/admin_dashboard.html', context)
 
 
 @login_required(login_url='/')
@@ -59,6 +117,7 @@ def add_client_save(request):
         password = request.POST.get("password")
         address = request.POST.get("address")
         mobile = request.POST.get("mobile")
+        commission_percentage = request.POST.get("commission_percentage")
 
         if CustomUser.objects.filter(email=email).exists():
             messages.warning(request, "Email already taken")
@@ -81,12 +140,14 @@ def add_client_save(request):
             if client:
                 client.address = address
                 client.mobile = mobile
+                client.commission_percentage = commission_percentage
                 client.save()
             else:
                 client = Clients.objects.create(
                     admin=user,
                     address=address,
                     mobile=mobile,
+                    commission_percentage=commission_percentage,
                     username=username
                 )
 
@@ -473,16 +534,59 @@ def sort_by_date(request):
     }
     return render(request, 'admin/sorted_by_date.html', context)
 
+
 @login_required
 def payments_admin(request):
-    # Get all bookings for rendering in the template
-    all_bookings = Bookings.objects.all().order_by('-timestamp')
+    # Get all bookings for rendering in the template, excluding admin-related bookings
+    all_bookings = Bookings.objects.exclude(reservation__ground__turf__added_by__user_type=1).order_by('-timestamp')
+
+    for booking in all_bookings:
+        try:
+            reservation = booking.reservation
+            ground = reservation.ground
+            turf = ground.turf
+            added_by = turf.added_by
+
+            # Check if the user has a related Clients object
+            if hasattr(added_by, 'clients'):
+                commission_percentage = added_by.clients.commission_percentage
+
+                # Calculate commission based on the percentage
+                commission = (commission_percentage / 100) * booking.amount
+
+                # Do something with the commission
+                amount_to_client = booking.amount - commission
+
+                # Save the commission details to the database
+                booking.commission = commission
+                booking.amount_to_client = amount_to_client
+                booking.save()
+
+            else:
+                # Handle the case where the user has no related Clients object
+                pass
+
+        except (Bookings.DoesNotExist, Clients.DoesNotExist):
+            # Handle the case where the booking or Clients object does not exist
+            pass
 
     context = {
         'all_bookings': all_bookings,
     }
 
     return render(request, 'admin/paymentspage_admin.html', context)
+
+
+@login_required
+def admins_only_payments(request):
+    # Get all admin bookings for rendering in the template
+    admin_bookings =Bookings.objects.exclude(reservation__ground__turf__added_by__user_type=2).order_by('-timestamp')
+
+    context = {
+        'admin_bookings': admin_bookings,
+    }
+
+    return render(request, 'admin/adminsonly_payments.html', context)
 
 
 @login_required

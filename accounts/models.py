@@ -4,28 +4,37 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from django.utils.timezone import datetime
+from django_otp.plugins.otp_totp.models import TOTPDevice as BaseTOTPDevice
+
+
+
+
 
 # Create your models here.
 class CustomUser(AbstractUser):
     user_type_data=((1,"ADMIN"),(2,"CLIENT"),(3,"USER"))
     user_type=models.CharField(default=1,choices=user_type_data,max_length=10)
     is_blocked = models.BooleanField(default=False)
+    otp_secret_key = models.CharField(max_length=50, blank=True, null=True)
+    
+  
 
-class MainAdmin(models.Model):
-    id=models.AutoField(primary_key=True)
-    admin=models.OneToOneField(CustomUser,on_delete=models.CASCADE)
-    created_at=models.DateTimeField(auto_now_add=True)
-    updated_at=models.DateTimeField(auto_now_add=True)
-    objects=models.Manager()
+
+    
+
+
 
 class Clients(models.Model):
     id=models.AutoField(primary_key=True)
     admin=models.OneToOneField(CustomUser,on_delete=models.CASCADE)
-    username=models.CharField(max_length=50,null=True)
+    
     mobile = models.CharField(max_length=20,default='')
     address=models.TextField()
     created_at=models.DateTimeField(auto_now_add=True)
-    updated_at=models.DateTimeField(auto_now_add=True)
+    commission_percentage = models.DecimalField(
+        max_digits=5, decimal_places=2, default=0.0,
+        help_text="Commission percentage for bookings (e.g., 10.00 for 10%)"
+    )
     
     objects=models.Manager()
     def __str__(self):
@@ -46,7 +55,12 @@ class Customers(models.Model):
     
     def __str__(self):
         return self.user.username
-# @receiver(post_save, sender=CustomUser)
+    
+
+@receiver(post_save, sender=CustomUser)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created and instance.user_type == 2:  # Check if the user is of type CLIENT
+        Clients.objects.create(admin=instance, address="", mobile="")
 # def create_user_profile(sender, instance, created, **kwargs):
 #     if created:
 #         if instance.user_type == 1:
@@ -129,17 +143,38 @@ class Reservation(models.Model):
     
 
 class Bookings(models.Model):
+   
     customer = models.ForeignKey(Customers, on_delete=models.CASCADE)
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
-    razorpay_payment_id = models.CharField(max_length=100,null=True)
+    razorpay_payment_id = models.CharField(max_length=100, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
-    turf_added_by=models.ForeignKey(CustomUser,on_delete=models.CASCADE,null=True)
+    turf_added_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    
     PAYMENT_CHOICES = (
         ('pending', 'Pending'),
         ('completed', 'Completed'),
     )
-    payment_status = models.CharField(max_length=10, choices=PAYMENT_CHOICES,default='Pending')
+    payment_status = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default='Pending')
+    
+    # Add this field to save the timestamp of changing the payment status
+    payment_status_timestamp = models.DateTimeField(null=True, blank=True)
+    commission = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    amount_to_client = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+
+    
+    def save(self, *args, **kwargs):
+        # Check if the payment_status field is changing
+        if self._state.adding or self.payment_status != self._original_payment_status:
+            # If it's changing, update the payment_status_timestamp field
+            self.payment_status_timestamp = timezone.now()
+        super().save(*args, **kwargs)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_payment_status = self.payment_status
+
+       
     
 
 from django.utils import timezone

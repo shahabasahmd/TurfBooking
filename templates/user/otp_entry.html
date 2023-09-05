@@ -1,0 +1,23 @@
+{% extends 'user/user_basefile.html' %}
+{% load static %}
+{% block title %}Enter OTP{% endblock title %}
+{% block customstyles %}
+    <!-- Add your custom styles here -->
+{% endblock customstyles %}
+{% block maincontent %}
+    <div class="container container-fluid mt-5 mb-5">
+        <div class="title">Enter OTP</div>
+        <div class="content">
+            <form action="{% url 'verify_otp' %}" method="post">
+                {% csrf_token %}
+                <div class="input-box">
+                    <span class="details">OTP</span>
+                    <input type="text" placeholder="Enter your OTP" name="otp" required>
+                </div>
+                <div class="button">
+                    <input class="mb-5" type="submit" value="Submit OTP">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock maincontent %}

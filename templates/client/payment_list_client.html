@@ -25,7 +25,6 @@
                                     <th class="font-weight-bold text-primary">Ground Name</th>
                                     <th class="font-weight-bold text-primary">Selected Date</th>
                                     <th class="font-weight-bold text-primary">Time Slot</th>
-                                    <th class="font-weight-bold text-primary">Razorpay Payment ID</th>
                                     <th class="font-weight-bold text-primary">Amount</th>
                                     <th class="font-weight-bold text-primary">Payment Status</th>
                                     <th class="font-weight-bold text-primary">Timestamp</th>
@@ -42,12 +41,13 @@
                                         {{ booking.reservation.time_slot.start_time|date:"h:i A" }} - 
                                         {{ booking.reservation.time_slot.end_time|date:"h:i A" }}
                                     </td>
-                                    <td>{{ booking.razorpay_payment_id }}</td>
-                                    <td>{{ booking.amount }}</td>
+                                    
+                                    <td>{{ booking.amount_to_client}}</td>
+                                    
                                     <td class="{% if booking.payment_status == 'pending' %}text-danger{% elif booking.payment_status == 'completed' %}text-success{% endif %}">
                                         {{ booking.get_payment_status_display }}
                                     </td>
-                                    <td>{{ booking.timestamp }}</td>
+                                    <td>{{ booking.payment_status_timestamp }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

@@ -21,6 +21,7 @@ urlpatterns = [
     #  end login and logout 
     # this for admin 
     path("success-admin",admin_views.success_page,name='success_page_admin'),
+    path("admindashboard",admin_views.dashboard,name="admin_dashborad"),
     path("adminhome",admin_views.adminhome,name="adminhome"),
     path('customers-admin/', admin_views.customer_list_admin, name='customer_list_admin'),
     path('delete_customer_admin/<int:customer_id>/', admin_views.delete_customer_admin, name='delete_customer_admin'),
@@ -56,6 +57,7 @@ urlpatterns = [
      path('sort-by-turf/', admin_views.sort_by_turf, name='sort-by-turf'),
     path('sort-by-date/', admin_views.sort_by_date, name='sort-by-date'),
     path('payments-admin/', admin_views.payments_admin, name='payments-admin'),
+    path('payments_admin_only/', admin_views.admins_only_payments, name='payments_admin_only'),
     path('update-payment-status/', admin_views.update_payment_status, name='update-payment-status'),
     path('enquiry-list/', admin_views.enquiry_list, name='enquiry_list'),
     path('enquiries/<int:pk>/delete/', admin_views.delete_enquiry, name='delete-enquiry'),
@@ -67,7 +69,6 @@ urlpatterns = [
     path('clienthome', client_views.clienthome, name='clienthome'),
     path('change-password/', client_views.change_password_view, name='change_password'),
     path('customers-client/', client_views.customer_list_client, name='customer_list_client'),
-    path('add_place_client/', client_views.add_place_client, name='add_place_client'),
     path('delete_customer_client/<int:customer_id>/', client_views.delete_customer_client, name='delete_customer_client'),
     path('addturfclient', client_views.add_turf_client, name='add_turf_client'),
     path('turfsaveclient', client_views.add_turf_save_client, name='save_turf_client'),
@@ -105,6 +106,7 @@ urlpatterns = [
     path('about/', users_views.about,name="about"),
     path('registeruser/', views.show_register,name="showregisterpage"),
     path('saveuser/', users_views.add_user_save,name="saveuserdetails"),
+   
     path('turf-list-user/', users_views.turf_list,name="turf_list_user"),
     path('turf-details/<int:turf_id>/', users_views.turf_details_user, name='turf_details_user'),
     path('available_time_slots/<int:ground_id>/', users_views.available_time_slots, name='available_time_slots'),

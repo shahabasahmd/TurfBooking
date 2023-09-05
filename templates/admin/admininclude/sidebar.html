@@ -11,10 +11,14 @@
          <div class="sidebar-inner slimscroll">
             <div id="sidebar-menu" class="sidebar-menu">
                <ul>
+                  <li>
+                     <a href="{% url 'admin_dashborad' %}"> <span>Dashborad</span></a>
+                  </li>
                   <li class="menu-title">
                      <span>Main Menu</span>
                   </li>
                   <li class="submenu">
+                     
                      <a href="#"><i class=" fas fa-chalkboard-teacher"></i> <span> Clients</span> <span class="menu-arrow"></span></a>
                      <ul>
                         <li><a href="{% url 'adminhome' %}">Client List</a></li>
@@ -47,12 +51,18 @@
                   <li>
                      <a href="{% url 'turf_list_reservation_admin' %}"><i class="fas fa-holly-berry"></i> <span>Reservations</span></a>
                   </li>
+
                   <li>
                      <a href="{% url 'bookings_page_admin' %}"><i class="fas fa-comment-dollar"></i> <span>Bookings</span></a>
                   </li>
-                  <li>
-                     <a href="{% url 'payments-admin' %}"><i class="fas fa-clipboard-list"></i> <span>Payments</span></a>
+                  <li class="submenu">
+                     <a href="#"><i class="fas fa-clipboard-list"></i> <span> Payments</span> <span class="menu-arrow"></span></a>
+                     <ul>
+                        <li><a href="{% url 'payments-admin' %}">Clients Payments </a></li>
+                        <li><a href="{% url 'payments_admin_only' %}">Admins Payments</a></li>
+                     </ul>
                   </li>
+                  
                   <li>
                      <a href="{% url 'enquiry_list' %}"><i class="fas fa-user-plus"></i> <span>Enquiries</span></a>
                   </li>

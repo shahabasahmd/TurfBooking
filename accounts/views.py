@@ -33,7 +33,7 @@ def doLogin(request):
             else:
                 login(request, user)
                 if user.user_type == "1":
-                    return redirect('adminhome')
+                    return redirect('admin_dashborad')
                 elif user.user_type == "2":
                     return redirect('clienthome')
                 elif user.user_type == "3":

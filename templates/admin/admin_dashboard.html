@@ -1,0 +1,80 @@
+{% extends 'admin/adminbase.html' %}
+{% block tile %}Dashboard{% endblock tile %}
+{% block maincontent %}
+<div class="content container-fluid">
+   <!-- ... (Your existing content) ... -->
+   <div class="row">
+     <!-- Revenue Chart Column -->
+     <div class="col-md-6">
+         <div class="card card-chart">
+             <div class="card-header">
+                 <div class="row align-items-center">
+                     <div class="col-6">
+                         <h5 class="card-title">Revenue</h5>
+                     </div>
+                 </div>
+             </div>
+             <div class="card-body">
+                 <!-- Revenue Chart Container -->
+                 <div id="revenue-chart"></div>
+             </div>
+         </div>
+     </div>
+
+     <!-- Number of Bookings Chart Column -->
+     <div class="col-md-6">
+         <div class="card card-chart">
+             <div class="card-header">
+                 <div class="row align-items-center">
+                     <div class="col-6">
+                         <h5 class="card-title">Number of Bookings</h5>
+                     </div>
+                 </div>
+             </div>
+             <div class="card-body">
+                 <!-- Bookings Chart Container -->
+                 <div id="bookings-chart"></div>
+             </div>
+         </div>
+     </div>
+ </div>
+ <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js"></script>
+<script>
+    // Dynamic data from Django context
+    var revenueData = {{ revenue_data|safe }};
+    var bookingsData = {{ bookings_data|safe }};
+
+    // Initialize the revenue chart
+    var revenueChart = new ApexCharts(document.querySelector("#revenue-chart"), {
+        chart: {
+            type: 'area',
+        },
+        series: [{
+            name: "Revenue",
+            data: revenueData,
+        }],
+        xaxis: {
+            categories: ["Sep", "Oct", "Nov", "Dec"],
+        },
+    });
+    revenueChart.render();
+
+    // Initialize the bookings chart
+    var bookingsChart = new ApexCharts(document.querySelector("#bookings-chart"), {
+        chart: {
+            type: 'bar',
+        },
+        series: [{
+            name: "Bookings",
+            data: bookingsData,
+        }],
+        xaxis: {
+            categories: ["Sep", "Oct", "Nov", "Dec", "Jan", "Feb"],
+        },
+    });
+    bookingsChart.render();
+</script>
+{% endblock maincontent %}

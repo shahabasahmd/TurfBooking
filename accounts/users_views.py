@@ -18,7 +18,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .forms import PasswordResetForm
 from django.contrib.auth import login
-
+import pyotp
 
 def home(request):
     return render(request,'user/home.html',locals())
@@ -30,6 +30,7 @@ def about(request):
 
 def show_register(request):
     return render(request,'register.html')
+
 
 def add_user_save(request):
     if request.method == "POST":
@@ -78,6 +79,21 @@ def add_user_save(request):
 
     # If the request method is not "POST", you can render the registration page
     return render(request, 'registration/register.html')
+@login_required
+def turf_list(request):
+    user_selected_place = request.GET.get('place')  # Get the selected place from the query parameter
+    turfs = TurfDetails.objects.filter(place__place=user_selected_place) if user_selected_place else TurfDetails.objects.all()
+    return render(request, 'user/turf_list.html', {'turfs': turfs})
+
+
+
+@login_required
+def turf_list(request):
+    user_selected_place = request.GET.get('place')  # Get the selected place from the query parameter
+    turfs = TurfDetails.objects.filter(place__place=user_selected_place) if user_selected_place else TurfDetails.objects.all()
+    return render(request, 'user/turf_list.html', {'turfs': turfs})
+
+
 @login_required
 def turf_list(request):
     user_selected_place = request.GET.get('place')  # Get the selected place from the query parameter
