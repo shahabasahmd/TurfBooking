@@ -327,7 +327,7 @@ def payment_done(request):
                     except Reservation.DoesNotExist:
                         pass  # Ignore non-existent reservations
 
-            print("Payment Details Saved Successfully")
+            
             return redirect('booking_history')
         except Exception as e:
             print("Error:", e)

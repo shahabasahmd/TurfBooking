@@ -1,0 +1,162 @@
+{% extends 'client/clientbase.html' %}
+{% block tile %} Dashboard{% endblock tile %}
+{% block maincontent %}
+
+    <div class="content container-fluid">
+       <div class="page-header">
+          <div class="row">
+             <div class="col-sm-12">
+                
+                <ul class="breadcrumb">
+                   <li class="breadcrumb-item active">Dashboard</li>
+                </ul>
+             </div>
+          </div>
+       </div>
+       <div class="row">
+          <div class="col-xl-3 col-sm-6 col-12 d-flex">
+             <div class="card bg-one w-100">
+                <div class="card-body">
+                   <div class="db-widgets d-flex justify-content-between align-items-center">
+                      <div class="db-icon">
+                         <i class="fas fa-building"></i>
+                      </div>
+                      <div class="db-info">
+                         <h3>{{ total_turfs }}</h3>
+                         <h6>Turfs </h6>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <div class="col-xl-3 col-sm-6 col-12 d-flex">
+             <div class="card bg-two w-100">
+                <div class="card-body">
+                   <div class="db-widgets d-flex justify-content-between align-items-center">
+                      <div class="db-icon">
+                         <i class="fas fa-building"></i>
+                      </div>
+                      <div class="db-info">
+                         <h3>{{ total_grounds }}</h3>
+                         <h6>Grounds</h6>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+          
+          <div class="col-xl-3 col-sm-6 col-12 d-flex">
+             <div class="card bg-four w-100">
+                <div class="card-body">
+                   <div class="db-widgets d-flex justify-content-between align-items-center">
+                      <div class="db-icon">
+                         <i class="fas fa-file-invoice-dollar"></i>
+                      </div>
+                      <div class="db-info">
+                         <h3>${{ total_profit }}</h3>
+                         <h6>Profits </h6>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <div class="col-xl-3 col-sm-6 col-12 d-flex">
+            <div class="card bg-two w-100">
+               <div class="card-body">
+                  <div class="db-widgets d-flex justify-content-between align-items-center">
+                     <div class="db-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                     </div>
+                     <div class="db-info">
+                        <h3>{{total_pending_transactions}}</h3>
+                        <h6>Number of Pending Transactions </h6>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+       </div>
+       <div class="row">
+        <!-- Profit Chart -->
+        <div class="col-md-12 col-lg-6">
+         <div class="card card-chart">
+             <div class="card-header">
+                 <div class="row align-items-center">
+                     <div class="col-6">
+                         <h5 class="card-title">Profit</h5>
+                     </div>
+                 </div>
+             </div>
+             <div class="card-body">
+                 <div id="profit-chart"></div>
+             </div>
+         </div>
+     </div>
+ 
+     <!-- Number of Bookings Chart -->
+     <div class="col-md-12 col-lg-6">
+         <div class="card card-chart">
+             <div class="card-header">
+                 <div class="row align-items-center">
+                     <div class="col-6">
+                         <h5 class="card-title">Number of Bookings</h5>
+                     </div>
+                 </div>
+             </div>
+             <div class="card-body">
+                 <div id="booking-chart"></div>
+             </div>
+         </div>
+     </div>
+ </div>
+ 
+ <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+ <script>
+  document.addEventListener("DOMContentLoaded", function () {
+      // Fetch the data from Django context
+      const profitLabels = {{ profit_labels | safe }};
+      const profitValues = {{ profit_values | safe }};
+      const bookingLabels = {{ booking_labels | safe }};
+      const bookingValues = {{ booking_values | safe }};
+
+      // Create profit chart
+      const profitChartOptions = {
+          chart: {
+              type: "line",
+              height: 350,
+          },
+          xaxis: {
+              categories: profitLabels,
+          },
+          series: [
+              {
+                  name: "Profit",
+                  data: profitValues,
+              },
+          ],
+      };
+      new ApexCharts(document.querySelector("#profit-chart"), profitChartOptions).render();
+
+      // Create booking chart
+      const bookingChartOptions = {
+          chart: {
+              type: "bar",
+              height: 350,
+          },
+          xaxis: {
+              categories: bookingLabels,
+          },
+          series: [
+              {
+                  name: "Number of Bookings",
+                  data: bookingValues,
+              },
+          ],
+      };
+      new ApexCharts(document.querySelector("#booking-chart"), bookingChartOptions).render();
+  });
+</script>
+       
+       
+   
+{% endblock maincontent %}

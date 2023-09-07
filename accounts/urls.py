@@ -66,6 +66,7 @@ urlpatterns = [
 
     # client section
     path("success-client",client_views.success_page_client,name='success_page_client'),
+    path('clientdashboard', client_views.client_dashboard, name='client_dashboard'),
     path('clienthome', client_views.clienthome, name='clienthome'),
     path('change-password/', client_views.change_password_view, name='change_password'),
     path('customers-client/', client_views.customer_list_client, name='customer_list_client'),

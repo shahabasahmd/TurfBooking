@@ -38,9 +38,25 @@
                                <span class="title-span">Address : </span>
                                <span class="info-span">{{client.address}}</span>
                             </li>
+                            
                          </ul>
                       </div>
                    </div>
+                   <h4 class="mt-5">Commission Percentage and Bank Details</h4>
+<div class="media mt-3">
+    <div class="media-body">
+        <ul>
+            <li>
+                <span class="title-span">Commission  </span>
+                <span class="info-span">{{ client.commission_percentage }} %</span>
+            </li>
+            <li>
+                <span class="title-span">Bank Account Details: </span>
+                <span class="info-span">{{ client.account_details }}</span>
+            </li>
+        </ul>
+    </div>
+</div>
                    
                    
                    <h4 class="mt-5">Settings</h4>

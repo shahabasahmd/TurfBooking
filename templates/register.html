@@ -164,7 +164,7 @@ form .user-details .input-box{
   <div class="container container-fluid mt-5 mb-5">
     <div class="title">Registration</div>
     <div class="content">
-      <form action="{% url 'enter_otp' %}" method="post">
+      <form action="{% url 'saveuserdetails' %}" method="post">
         {% csrf_token %} 
         <div class="user-details">
           <div class="input-box">

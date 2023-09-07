@@ -6,17 +6,80 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import update_session_auth_hash,authenticate
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
+from django.db.models import Sum,Count
+from django.db.models.functions import TruncMonth
 
 @login_required
 def success_page_client(request):
     return render(request,'client/clientinclude/success_client.html')
 
+from decimal import Decimal
+
+import json
+from django.db.models.functions import ExtractMonth, ExtractYear
+@login_required
+def client_dashboard(request):
+    user = request.user
+    total_turfs = TurfDetails.objects.filter(added_by=user).count()
+    total_grounds = Ground.objects.filter(turf__added_by=user).count()
+    total_profit = Bookings.objects.filter(turf_added_by=user, payment_status='completed').aggregate(total_profit=Sum('amount_to_client'))['total_profit'] or Decimal('0.00')
+    total_pending_transactions = Bookings.objects.filter(turf_added_by=user, payment_status='pending').count()
+    
+    # Retrieve monthly profit data
+    monthly_profit_data = Bookings.objects.filter(
+        turf_added_by=user,
+        payment_status='completed',
+        timestamp__lte=timezone.now()
+    ).annotate(
+        month=TruncMonth('timestamp')
+    ).values(
+        'month'
+    ).annotate(
+        total_profit=Sum('amount_to_client')
+    ).order_by('month')
+
+    # Retrieve monthly booking data
+    monthly_booking_data = Bookings.objects.filter(
+        turf_added_by=user,
+        timestamp__lte=timezone.now()
+    ).annotate(
+        month=TruncMonth('timestamp')
+    ).values(
+        'month'
+    ).annotate(
+        total_bookings=Count('id')
+    ).order_by('month')
+
+    # Define a list of month names
+    month_names = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ]
+
+    # Prepare data for the charts
+    profit_labels = [entry['month'].strftime('%b %Y') for entry in monthly_profit_data]
+    profit_values = [float(entry['total_profit'] or 0) for entry in monthly_profit_data]
+
+    booking_labels = [entry['month'].strftime('%b %Y') for entry in monthly_booking_data]
+    booking_values = [entry['total_bookings'] for entry in monthly_booking_data]
+
+    context = {
+        'total_turfs': total_turfs,
+        'total_grounds': total_grounds,
+        'total_profit': float(total_profit),  # Convert total_profit to float
+        'total_pending_transactions': total_pending_transactions,
+        'profit_labels': json.dumps(profit_labels),
+        'profit_values': json.dumps(profit_values),
+        'booking_labels': json.dumps(booking_labels),
+        'booking_values': json.dumps(booking_values),
+    }
+    return render(request, 'client/client_dashboard.html', context)
+
+
 @login_required(login_url='/')
 def clienthome(request ):
     user = request.user
     client = Clients.objects.filter(admin=user).first()
-
-    # Pass the client object to the template context
     return render(request, 'client/clienthome.html', {'client': client})
 
 
@@ -26,18 +89,15 @@ def change_password_view(request):
         current_password = request.POST.get('current_password')
         new_password = request.POST.get('new_password')
 
-        # Get the currently authenticated user from the request
+        
         user = request.user
-        print(current_password,new_password,user)
-
-        # Check if the current password is valid for the user
         if user.check_password(current_password):
-            # Use the set_password method to change the password
+            
             user.set_password(new_password)
             user.save()
-            update_session_auth_hash(request, user)  # Update the session to prevent auto logout
+            update_session_auth_hash(request, user)  
             messages.success(request, 'Your password has been changed successfully.')
-            return redirect('success_page_client')  # Replace 'change_password' with the URL name for this view
+            return redirect('success_page_client')  
         else:
             messages.error(request, 'Invalid current password. Please try again.')
 
@@ -72,7 +132,7 @@ def add_turf_client(request):
 def add_turf_save_client(request):
     if request.method == 'POST':
         turf_name = request.POST.get('turf_name')
-        place_name = request.POST.get('place')  # Get the place name from the form
+        place_name = request.POST.get('place') 
         phone = request.POST.get('mobile')
         cafe = request.POST.get('cafe')
         first_aid = request.POST.get('firstaid')
@@ -81,13 +141,13 @@ def add_turf_save_client(request):
         shower = request.POST.get('shower')
         image = request.FILES.get('turf_image')
 
-        # Look up the place by name
+        
         try:
             place = Places.objects.get(place=place_name)
         except Places.DoesNotExist:
             place = None
 
-        # Check if place is not null before creating TurfDetails instance
+       
         if place is not None:
             turf = TurfDetails.objects.create(
                 added_by=request.user,  
@@ -117,7 +177,6 @@ def client_turf_list(request):
 
 @login_required
 def add_ground_client(request):
-    # Fetch turf names uploaded by the logged-in client
     user = request.user
     turf_names = TurfDetails.objects.filter(added_by=user).values('id', 'turf_name')
 
@@ -132,10 +191,8 @@ def save_ground_client(request):
         ground_name = request.POST.get('ground_name')
         price = request.POST.get('price')
         
-        # Get the logged-in user's ID
+        
         user_id = request.user.id
-
-        # Create a new GroundDetails object and save the data
         ground = Ground(
             turf_id=turf_id,
             category=category,
@@ -145,48 +202,37 @@ def save_ground_client(request):
             
         )
         ground.save()
-
-        # Redirect to a success page or back to the form page
-        return redirect('success_page_client')  # Replace 'success_page' with the URL name for your success page
+        return redirect('success_page_client')  
 
     else:
-        # Render the form page
         turfs = TurfDetails.objects.filter(added_by=request.user)
         return render(request, 'client/add_ground_client.html', {'turfs': turfs})
 
 
 @login_required
 def ground_list_by_turf(request, turf_id):
-    # Get the list of grounds associated with the selected turf
     grounds = Ground.objects.filter(turf_id=turf_id)
-    
-    # Pass the ground objects to the template
     return render(request, 'client/list_ground_client.html', {'grounds': grounds})
 
 
 
 @login_required
 def delete_ground(request, ground_id):
-    # Get the ground object based on the provided ground_id
+    
     try:
         ground = Ground.objects.get(id=ground_id)
     except Ground.DoesNotExist:
-        # Handle if the ground with the given ID doesn't exist
-        return redirect('ground_list_by_turf')  # Replace 'ground_list' with the URL name for your ground list page
+        return redirect('ground_list_by_turf')  
 
-    # Check if the ground belongs to the logged-in user
+    
     if ground.turf.added_by == request.user:
-        # Delete the ground
         ground.delete()
     
-    # Get the turf_id of the deleted ground
     turf_id = ground.turf.id
-
-    # Redirect back to the ground list page with the turf_id parameter
     return redirect('ground_list_by_turf', turf_id=turf_id)
 
 @login_required
-def delete_turf_confirmation_page(request, turf_id):  # Correct the function name here
+def delete_turf_confirmation_page(request, turf_id):  
     turf = get_object_or_404(TurfDetails, id=turf_id, added_by=request.user)
     return render(request, 'client/delete_turf_confirmation.html', {'turf': turf})
 
@@ -196,7 +242,7 @@ def delete_turf_confirmation(request, turf_id):
 
     if request.method == 'POST':
         turf.delete()
-        return redirect('client_turf_list')  # Redirect to the turf list page after deletion
+        return redirect('client_turf_list')  
     
     return render(request, 'client/delete_turf_confirmation.html', {'turf': turf})
     
@@ -398,3 +444,11 @@ def completed_payments(request):
     client_bookings = Bookings.objects.filter(turf_added_by=request.user, payment_status='completed')
     context = {'client_bookings': client_bookings}
     return render(request, 'client/payment_list_client.html', context)
+
+
+
+
+
+
+
+

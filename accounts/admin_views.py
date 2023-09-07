@@ -35,8 +35,6 @@ def dashboard(request):
 
     # Calculate the total profit as the sum of booking amount and commission
     total_profit = total_booking_amount + total_commission
-
-    # Query the database to get revenue data
     revenue_data = Bookings.objects.filter(
         turf_added_by=request.user,
         payment_status='completed'
@@ -44,22 +42,13 @@ def dashboard(request):
         month=ExtractMonth('timestamp')
     ).values('month').annotate(
         monthly_revenue=Sum('amount')
-    ).order_by('month')
-
-    # Create empty revenue data list with zeros for each month
-    revenue_months = list(range(1, 13))  # Assuming you have 12 months in a year
-    revenue_values = [0] * len(revenue_months)
-
-    # Populate the revenue data list with actual data
-    for item in revenue_data:
-        month_index = item['month'] - 1  # Month 1 will be at index 0
-        revenue_values[month_index] = item['monthly_revenue']
+    ).order_by('month').values_list('monthly_revenue', flat=True)
 
     # Query the database to get booking data (monthly count of bookings)
     bookings_data = Bookings.objects.annotate(
-        month=ExtractMonth('timestamp')
+    month=ExtractMonth('timestamp')
     ).values('month').annotate(
-        monthly_bookings=Sum(1)
+    monthly_bookings=Sum(1)
     ).order_by('month').values_list('monthly_bookings', flat=True)
 
     context = {
@@ -67,11 +56,10 @@ def dashboard(request):
         'clients_count': clients_count,
         'grounds_count': grounds_count,
         'total_profit': total_profit,
-        'revenue_data': list(revenue_data),
+          'revenue_data': list(revenue_data),
         'bookings_data': list(bookings_data),
     }
     return render(request, 'admin/admin_dashboard.html', context)
-
 
 @login_required(login_url='/')
 def adminhome(request):
@@ -105,6 +93,7 @@ def delete_customer_admin(request, customer_id):
     return redirect('customer_list_admin')
 
 
+
 @login_required
 def add_client_save(request):
     if request.method != "POST":
@@ -118,6 +107,7 @@ def add_client_save(request):
         address = request.POST.get("address")
         mobile = request.POST.get("mobile")
         commission_percentage = request.POST.get("commission_percentage")
+        account_details = request.POST.get("account_details")  # Get account details from the form
 
         if CustomUser.objects.filter(email=email).exists():
             messages.warning(request, "Email already taken")
@@ -141,6 +131,7 @@ def add_client_save(request):
                 client.address = address
                 client.mobile = mobile
                 client.commission_percentage = commission_percentage
+                client.account_details = account_details  # Set account details field
                 client.save()
             else:
                 client = Clients.objects.create(
@@ -148,10 +139,11 @@ def add_client_save(request):
                     address=address,
                     mobile=mobile,
                     commission_percentage=commission_percentage,
+                    account_details=account_details,  # Set account details field
                     username=username
                 )
 
-            return redirect('success_page_admin') 
+            return redirect('success_page_admin')
 
 @login_required
 def delete_client(request, id):

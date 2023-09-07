@@ -1,8 +1,80 @@
 {% extends 'admin/adminbase.html' %}
 {% block tile %}Dashboard{% endblock tile %}
 {% block maincontent %}
+
 <div class="content container-fluid">
-   <!-- ... (Your existing content) ... -->
+   <div class="page-header">
+      <div class="row">
+         <div class="col-sm-12">
+            <h3 class="page-title">Welcome Admin!</h3>
+            <ul class="breadcrumb">
+               <li class="breadcrumb-item active">Dashboard</li>
+            </ul>
+         </div>
+      </div>
+   </div>
+   <div class="row">
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-one w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fas fa-user"></i>
+                  </div>
+                  <div class="db-info">
+                    <h3>{{ customer_count }}</h3>
+                     <h6>Customers</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-two w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fas fa-chalkboard-teacher"></i>
+                  </div>
+                  <div class="db-info">
+                    <h3>{{ clients_count }}</h3>
+                     <h6>Clients</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-three w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fas fa-building"></i>
+                  </div>
+                  <div class="db-info">
+                    <h3>{{ grounds_count }}</h3>
+                     <h6>Grounds</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-four w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fas fa-file-invoice-dollar"></i>
+                  </div>
+                  <div class="db-info">
+                     <h3>${{total_profit}}</h3>
+                     <h6>Profit</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
    <div class="row">
      <!-- Revenue Chart Column -->
      <div class="col-md-6">
@@ -41,7 +113,7 @@
  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js"></script>
+
 <script>
     // Dynamic data from Django context
     var revenueData = {{ revenue_data|safe }};
@@ -77,4 +149,8 @@
     });
     bookingsChart.render();
 </script>
+
+   
+   
+
 {% endblock maincontent %}

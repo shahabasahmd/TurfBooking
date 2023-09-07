@@ -15,7 +15,7 @@ class CustomUser(AbstractUser):
     user_type_data=((1,"ADMIN"),(2,"CLIENT"),(3,"USER"))
     user_type=models.CharField(default=1,choices=user_type_data,max_length=10)
     is_blocked = models.BooleanField(default=False)
-    otp_secret_key = models.CharField(max_length=50, blank=True, null=True)
+    
     
   
 
@@ -35,6 +35,7 @@ class Clients(models.Model):
         max_digits=5, decimal_places=2, default=0.0,
         help_text="Commission percentage for bookings (e.g., 10.00 for 10%)"
     )
+    account_details=models.CharField(max_length=100,null=True)
     
     objects=models.Manager()
     def __str__(self):
