@@ -345,7 +345,7 @@ def payment_done(request):
 def booking_history(request):
     # Fetch the bookings for the logged-in customer
     customer = request.user.customers
-    bookings = Bookings.objects.filter(customer=customer)
+    bookings = Bookings.objects.filter(customer=customer).order_by('-timestamp')
 
     context = {
         'bookings': bookings
@@ -357,18 +357,20 @@ def booking_history(request):
 
 def enquiry_view(request):
     if request.method == 'POST':
+        name = request.POST.get('name')  # Get the name input value
+        place = request.POST.get('place')  # Get the place input value
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         message = request.POST.get('message')
 
-        enquiry = Enquiry(email=email, phone=phone, message=message)
+        enquiry = Enquiry(name=name, place=place, email=email, phone=phone, message=message)
         enquiry.save()
 
         messages.success(request, "Your information has been received. Our team will contact you soon.")
 
         return render(request, 'user/home.html')    
 
-    return render(request, 'user/home.html')    
+    return render(request, 'user/home.html')
 
 
 @login_required

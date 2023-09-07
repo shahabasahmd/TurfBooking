@@ -1,0 +1,62 @@
+{% extends 'client/clientbase.html' %}
+{% load static %}
+{% block tile %}Clients edit personal Details{% endblock tile %}
+{% block maincontent %}
+
+<div class="content container-fluid">
+    <div class="page-header">
+       <div class="row align-items-center">
+          <div class="col">
+             <h3 class="page-title">Edit Personal Details </h3>
+             
+          </div>
+       </div>
+    </div>
+    <div class="row">
+       <div class="col-sm-12">
+          <div class="card">
+             <div class="card-body">
+               <form method="post" action="{% url 'update_profile' %}">
+                  {% csrf_token %}
+                  <div class="row">
+                      
+                     
+              
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label>Mobile</label>
+                            <input type="text" class="form-control" name="mobile" value="{{ client.mobile }}" required>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" class="form-control" name="address" value="{{ client.address }}" required>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label>Bank Account Details</label>
+                            <input type="text" class="form-control" name="account_details" value="{{ client.account_details }}" required>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                        <div class="form-group">
+                            <label>UPI ID or Number</label>
+                            <input type="text" class="form-control" name="upi" value="{{ client.upi }}" required>
+                        </div>
+                    </div>
+                      
+              
+                      <div class="col-12">
+                          <button type="submit" class="btn btn-primary">Submit</button>
+                      </div>
+                  </div>
+              </form>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+
+{% endblock maincontent %}

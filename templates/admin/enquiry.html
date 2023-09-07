@@ -12,6 +12,8 @@
                         <table class="table table-hover table-bordered table-center mb-0 datatable">
                             <thead class="thead-dark">
                                 <tr>
+                                    <th class="font-weight-bold text-primary">Name</th>
+                                    <th class="font-weight-bold text-primary">Place</th>
                                     <th class="font-weight-bold text-primary">Email</th>
                                     <th class="font-weight-bold text-primary">Phone</th>
                                     <th class="font-weight-bold text-primary">Message</th>
@@ -24,7 +26,8 @@
                                 <tbody>
                                     {% for enquiry in enquiries %}
                                     <tr>
-                                        
+                                        <td>{{ enquiry.name }}</td>
+                                        <td>{{ enquiry.place }}</td>
                                         <td>{{ enquiry.email }}</td>
                                         <td>{{ enquiry.phone }}</td>
                                         <td>{{ enquiry.message }}</td>

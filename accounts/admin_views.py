@@ -9,14 +9,11 @@ from django.shortcuts import get_object_or_404
 # from .utils import add_time
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
-from django.db.models import Sum
+from django.db.models import Sum,F
 
 
 def success_page(request):
     return render(request,'admin/admininclude/success_admin.html')
-
-
-
 
 
 from django.db.models.functions import ExtractMonth
@@ -99,6 +96,7 @@ def add_client_save(request):
     if request.method != "POST":
         return HttpResponse("Method Not Allowed")
     else:
+        # Retrieve form input values
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         username = request.POST.get("username")
@@ -107,7 +105,8 @@ def add_client_save(request):
         address = request.POST.get("address")
         mobile = request.POST.get("mobile")
         commission_percentage = request.POST.get("commission_percentage")
-        account_details = request.POST.get("account_details")  # Get account details from the form
+        account_details = request.POST.get("account_details")
+        upi_num_or_id = request.POST.get("upi")  # Get UPI ID or number from the form
 
         if CustomUser.objects.filter(email=email).exists():
             messages.warning(request, "Email already taken")
@@ -131,7 +130,8 @@ def add_client_save(request):
                 client.address = address
                 client.mobile = mobile
                 client.commission_percentage = commission_percentage
-                client.account_details = account_details  # Set account details field
+                client.account_details = account_details
+                client.upi_num_or_id = upi_num_or_id  # Set UPI ID or number field
                 client.save()
             else:
                 client = Clients.objects.create(
@@ -139,8 +139,8 @@ def add_client_save(request):
                     address=address,
                     mobile=mobile,
                     commission_percentage=commission_percentage,
-                    account_details=account_details,  # Set account details field
-                    username=username
+                    account_details=account_details,
+                    upi_num_or_id=upi_num_or_id  # Set UPI ID or number field
                 )
 
             return redirect('success_page_admin')
@@ -532,7 +532,16 @@ def payments_admin(request):
     # Get all bookings for rendering in the template, excluding admin-related bookings
     all_bookings = Bookings.objects.exclude(reservation__ground__turf__added_by__user_type=1).order_by('-timestamp')
 
-    for booking in all_bookings:
+    # Create a Paginator instance with 10 items per page
+    paginator = Paginator(all_bookings, 10)
+
+    # Get the current page number from the request's GET parameters
+    page_number = request.GET.get('page')
+
+    # Get the Page object for the current page number
+    page = paginator.get_page(page_number)
+
+    for booking in page:
         try:
             reservation = booking.reservation
             ground = reservation.ground
@@ -563,7 +572,8 @@ def payments_admin(request):
             pass
 
     context = {
-        'all_bookings': all_bookings,
+        'page': page,  
+        'all_bookings':all_bookings
     }
 
     return render(request, 'admin/paymentspage_admin.html', context)

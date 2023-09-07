@@ -17,6 +17,8 @@ from decimal import Decimal
 
 import json
 from django.db.models.functions import ExtractMonth, ExtractYear
+
+
 @login_required
 def client_dashboard(request):
     user = request.user
@@ -29,7 +31,6 @@ def client_dashboard(request):
     monthly_profit_data = Bookings.objects.filter(
         turf_added_by=user,
         payment_status='completed',
-        timestamp__lte=timezone.now()
     ).annotate(
         month=TruncMonth('timestamp')
     ).values(
@@ -41,7 +42,6 @@ def client_dashboard(request):
     # Retrieve monthly booking data
     monthly_booking_data = Bookings.objects.filter(
         turf_added_by=user,
-        timestamp__lte=timezone.now()
     ).annotate(
         month=TruncMonth('timestamp')
     ).values(
@@ -49,12 +49,6 @@ def client_dashboard(request):
     ).annotate(
         total_bookings=Count('id')
     ).order_by('month')
-
-    # Define a list of month names
-    month_names = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ]
 
     # Prepare data for the charts
     profit_labels = [entry['month'].strftime('%b %Y') for entry in monthly_profit_data]
@@ -76,11 +70,52 @@ def client_dashboard(request):
     return render(request, 'client/client_dashboard.html', context)
 
 
+
 @login_required(login_url='/')
 def clienthome(request ):
     user = request.user
     client = Clients.objects.filter(admin=user).first()
     return render(request, 'client/clienthome.html', {'client': client})
+
+
+@login_required
+def edit_profile(request):
+    # Assuming you have a one-to-one relationship between User and Clients
+    client = get_object_or_404(Clients, admin=request.user)
+
+    context = {
+        'client': client,
+    }
+
+    return render(request, 'client/edit_profile.html', context)
+
+def update_profile(request):
+    if request.method == 'POST':
+        mobile = request.POST.get('mobile')
+        address = request.POST.get('address')
+        account_details = request.POST.get('account_details')
+        upi_num_or_id = request.POST.get('upi')
+
+        # Get the current user
+        user = request.user
+
+        # Check if the user is a client
+        if user.is_authenticated :
+            client = Clients.objects.get(admin=user)
+            client.mobile = mobile
+            client.address = address
+            client.account_details = account_details
+            client.upi_num_or_id = upi_num_or_id
+            client.save()
+            messages.success(request, 'Your personal details have been updated successfully.')
+            return redirect('success_page_client')  # Redirect to the client's profile page after successful update
+        else:
+            messages.error(request, 'You do not have permission to perform this action.')
+    else:
+        # Handle GET request or other methods if needed
+        pass
+
+    return render(request, 'client/edit_profile.html')
 
 
 @login_required

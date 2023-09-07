@@ -36,7 +36,7 @@ class Clients(models.Model):
         help_text="Commission percentage for bookings (e.g., 10.00 for 10%)"
     )
     account_details=models.CharField(max_length=100,null=True)
-    
+    upi_num_or_id=models.CharField(max_length=50,null=True)
     objects=models.Manager()
     def __str__(self):
         return f"Client ID: {self.id}, Username: {self.admin.username if self.admin else None}"
@@ -181,6 +181,8 @@ class Bookings(models.Model):
 from django.utils import timezone
 
 class Enquiry(models.Model):
+    name=models.CharField(max_length=50,null=True)
+    place=models.CharField(max_length=50,null=True)
     email = models.EmailField()
     phone = models.CharField(max_length=15)
     message = models.TextField()

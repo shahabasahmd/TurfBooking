@@ -3,94 +3,97 @@
 {% block tile %}Clients Home Page{% endblock tile %}
 {% block maincontent %}
 <div class="content container-fluid">
-    
-    <div class="card">
-       <div class="card-body">
-          <div class="row">
-             <div class="col-md-12">
-                <div class="about-info">
-                   <h4>About Me</h4>
-                   <div class="media mt-3">
-                      
-                      <div class="media-body">
-                         <ul>
-                            <li>
-                               <span class="title-span">First Name    : </span>
-                               <span class="info-span">{{user.first_name}}</span>
-                            </li>
-                            <li>
-                               <span class="title-span">Last Name    :</span>
-                               <span class="info-span">{{user.last_name}}</span>
-                            </li>
-                            <li>
-                               <span class="title-span">Mobile   : </span>
-                               <span class="info-span">{{client.mobile}}</span>
-                            </li>
-                            <li>
-                               <span class="title-span">User Name </span>
-                               <span class="info-span">{{user.username}}</span>
-                            </li>
-                            <li>
-                               <span class="title-span">Email </span>
-                               <span class="info-span">{{user.email}}</span>
-                            </li>
-                            <li>
-                               <span class="title-span">Address : </span>
-                               <span class="info-span">{{client.address}}</span>
-                            </li>
-                            
-                         </ul>
-                      </div>
-                   </div>
-                   <h4 class="mt-5">Commission Percentage and Bank Details</h4>
-<div class="media mt-3">
-    <div class="media-body">
-        <ul>
-            <li>
-                <span class="title-span">Commission  </span>
-                <span class="info-span">{{ client.commission_percentage }} %</span>
-            </li>
-            <li>
-                <span class="title-span">Bank Account Details: </span>
-                <span class="info-span">{{ client.account_details }}</span>
-            </li>
-        </ul>
-    </div>
-</div>
-                   
-                   
-                   <h4 class="mt-5">Settings</h4>
-                   
-                     <form method="post" action="{% url 'change_password' %}">
+   <div class="card">
+      <div class="card-body">
+         <div class="row">
+            <div class="col-md-12">
+               <div class="about-info">
+                  <h4>About Me</h4>
+                  <div class="media mt-3">
+                     <div class="media-body">
+                        <ul>
+                           <li>
+                              <span class="title-span">First Name    : </span>
+                              <span class="info-span">{{user.first_name}}</span>
+                           </li>
+                           <li>
+                              <span class="title-span">Last Name    :</span>
+                              <span class="info-span">{{user.last_name}}</span>
+                           </li>
+                           <li>
+                              <span class="title-span">Mobile   : </span>
+                              <span class="info-span">{{client.mobile}}</span>
+                           </li>
+                           <li>
+                              <span class="title-span">User Name </span>
+                              <span class="info-span">{{user.username}}</span>
+                           </li>
+                           <li>
+                              <span class="title-span">Email </span>
+                              <span class="info-span">{{user.email}}</span>
+                           </li>
+                           <li>
+                              <span class="title-span">Address : </span>
+                              <span class="info-span">{{client.address}}</span>
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+                  <h4 class="mt-5">Commission Percentage and Bank Details</h4>
+                  <div class="media mt-3">
+                     <div class="media-body">
+                        <ul>
+                           <li>
+                              <span class="title-span">Commission  :</span>
+                              <span class="info-span">{{ client.commission_percentage }} %</span>
+                           </li>
+                           <li>
+                              <span class="title-span">Bank Account Details: </span>
+                              <span class="info-span">{{ client.account_details }}</span>
+                           </li>
+                           <li>
+                              <span class="title-span">UPI ID or Number :</span>
+                              <span class="info-span">{{ client.upi_num_or_id }}</span>
+                           </li>
+                           <li>
+                              <div class="card">
+                                 <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Personal Details</a>
+                              </div>
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+                  <h4 class="mt-5">Settings</h4>
+                  <form method="post" action="{% url 'change_password' %}">
                      {% csrf_token %}
                      <div class="row mt-3">
-                         <div class="col-12 col-sm-6">
-                             <div class="form-group">
-                                 <label>Username</label>
-                                 <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
-                             </div>
-                         </div>
-                         <div class="col-12 col-sm-6">
-                             <div class="form-group">
-                                 <label>Current Password</label>
-                                 <input type="password" class="form-control" name="current_password" required>
-                             </div>
-                         </div>
-                         <div class="col-12 col-sm-6">
-                             <div class="form-group">
-                                 <label>New Password</label>
-                                 <input type="password" class="form-control" name="new_password" required>
-                             </div>
-                         </div>
-                         <div class="col-12">
-                             <button type="submit" class="btn btn-primary">Submit</button>
-                         </div>
+                        <div class="col-12 col-sm-6">
+                           <div class="form-group">
+                              <label>Username</label>
+                              <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
+                           </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                           <div class="form-group">
+                              <label>Current Password</label>
+                              <input type="password" class="form-control" name="current_password" required>
+                           </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                           <div class="form-group">
+                              <label>New Password</label>
+                              <input type="password" class="form-control" name="new_password" required>
+                           </div>
+                        </div>
+                        <div class="col-12">
+                           <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
                      </div>
-                 </form>
-                </div>
-             </div>
-          </div>
-       </div>
-    </div>
- </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
 {% endblock maincontent %}
