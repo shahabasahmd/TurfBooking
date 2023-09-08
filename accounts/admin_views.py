@@ -6,32 +6,27 @@ from django.contrib import messages
 from django.http import HttpResponse,JsonResponse
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
-# from .utils import add_time
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
-from django.db.models import Sum,F
-
+from django.db.models import Sum
+from django.db.models.functions import ExtractMonth
 
 def success_page(request):
     return render(request,'admin/admininclude/success_admin.html')
 
 
-from django.db.models.functions import ExtractMonth
+
 @login_required
 def dashboard(request):
-    # Get the count of customer records
     customer_count = Customers.objects.count()
     clients_count = Clients.objects.count()
     grounds_count = Ground.objects.count()
 
-    # Calculate the total booking amount listed by the admin
+    
     total_booking_amount = Bookings.objects.filter(turf_added_by=request.user).aggregate(Sum('amount'))['amount__sum'] or 0
-
-    # Calculate the total commission earned by the admin
     total_commission = Bookings.objects.aggregate(Sum('commission'))['commission__sum'] or 0
-
-    # Calculate the total profit as the sum of booking amount and commission
     total_profit = total_booking_amount + total_commission
+
     revenue_data = Bookings.objects.filter(
         turf_added_by=request.user,
         payment_status='completed'
@@ -41,7 +36,7 @@ def dashboard(request):
         monthly_revenue=Sum('amount')
     ).order_by('month').values_list('monthly_revenue', flat=True)
 
-    # Query the database to get booking data (monthly count of bookings)
+    
     bookings_data = Bookings.objects.annotate(
     month=ExtractMonth('timestamp')
     ).values('month').annotate(
@@ -81,10 +76,7 @@ def customer_list_admin(request):
 @login_required
 def delete_customer_admin(request, customer_id):
     customer = get_object_or_404(Customers, id=customer_id)
-    # Get the associated CustomUser
     user = customer.admin
-
-    # Delete the Customer and the associated CustomUser
     customer.delete()
     user.delete()
     return redirect('customer_list_admin')
@@ -96,7 +88,6 @@ def add_client_save(request):
     if request.method != "POST":
         return HttpResponse("Method Not Allowed")
     else:
-        # Retrieve form input values
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         username = request.POST.get("username")
@@ -106,7 +97,7 @@ def add_client_save(request):
         mobile = request.POST.get("mobile")
         commission_percentage = request.POST.get("commission_percentage")
         account_details = request.POST.get("account_details")
-        upi_num_or_id = request.POST.get("upi")  # Get UPI ID or number from the form
+        upi_num_or_id = request.POST.get("upi") 
 
         if CustomUser.objects.filter(email=email).exists():
             messages.warning(request, "Email already taken")
@@ -124,14 +115,14 @@ def add_client_save(request):
                 user_type=2
             )
 
-            # Check if a Clients instance already exists for the given admin user
+            
             client = Clients.objects.filter(admin=user).first()
             if client:
                 client.address = address
                 client.mobile = mobile
                 client.commission_percentage = commission_percentage
                 client.account_details = account_details
-                client.upi_num_or_id = upi_num_or_id  # Set UPI ID or number field
+                client.upi_num_or_id = upi_num_or_id  
                 client.save()
             else:
                 client = Clients.objects.create(
@@ -140,7 +131,7 @@ def add_client_save(request):
                     mobile=mobile,
                     commission_percentage=commission_percentage,
                     account_details=account_details,
-                    upi_num_or_id=upi_num_or_id  # Set UPI ID or number field
+                    upi_num_or_id=upi_num_or_id 
                 )
 
             return redirect('success_page_admin')
@@ -156,14 +147,9 @@ def delete_client(request, id):
 @login_required
 def block_client(request, user_id):
     client = get_object_or_404(CustomUser, id=user_id)
-
-    # Set is_blocked to True
     client.is_blocked = True
     client.save()
-
-    # Add a custom message when blocking the client
     messages.success(request, f"{client.username} has been blocked.")
-
     return redirect('adminhome')
 
 
@@ -192,17 +178,11 @@ def add_place(request):
         place_name = request.POST['place_name']
         Places.objects.create(place=place_name)
 
-    # Fetch all places from the database
     all_places = Places.objects.all()
-
-    # Set the number of places per page
     places_per_page = 20
     paginator = Paginator(all_places, places_per_page)
-
-    # Get the current page number from the request's GET parameters
     page_number = request.GET.get('page')
     places = paginator.get_page(page_number)
-
     return render(request, 'admin/addplace.html', {'places': places})
 
 def delete_place(request, place_id):
@@ -210,7 +190,6 @@ def delete_place(request, place_id):
         place = Places.objects.get(id=place_id)
         place.delete()
     except Places.DoesNotExist:
-        # Handle case when the place doesn't exist
         pass
     
     return redirect('add_place')
@@ -218,7 +197,7 @@ def delete_place(request, place_id):
 
 @login_required
 def add_turf(request):
-    places_list = Places.objects.all()  # Get the list of all places
+    places_list = Places.objects.all() 
     context = {
         'places': places_list
     }
@@ -229,7 +208,7 @@ def add_turf(request):
 def add_turf_save(request):
     if request.method == 'POST':
         turf_name = request.POST.get('turf_name')
-        place_name = request.POST.get('place')  # Get the place name from the form
+        place_name = request.POST.get('place') 
         phone = request.POST.get('mobile')
         cafe = request.POST.get('cafe')
         first_aid = request.POST.get('firstaid')
@@ -238,13 +217,13 @@ def add_turf_save(request):
         shower = request.POST.get('shower')
         image = request.FILES.get('turf_image')
 
-        # Look up the place by name
+        
         try:
             place = Places.objects.get(place=place_name)
         except Places.DoesNotExist:
             place = None
 
-        # Check if place is not null before creating TurfDetails instance
+       
         if place is not None:
             turf = TurfDetails.objects.create(
                 added_by=request.user,  
@@ -293,15 +272,10 @@ def add_ground_page_admin(request):
         ground_name = request.POST['ground_name']
         price = request.POST['price']
         
-
-        # Create a new Ground instance and save it to the database
         ground = Ground(turf_id=turf_id, category=category, ground_name=ground_name, price=price)
         ground.save()
-
-        # Redirect to the page you want to show after the form submission
-        return redirect('success_page_admin')  # Change 'some_view_name' to the desired view name
-
-    # If it's not a POST request, render the template as usual
+        return redirect('success_page_admin')  
+    
     return render(request, 'admin/add_ground_page_admin.html', {'turfs': TurfDetails.objects.all()})
 
 
@@ -319,8 +293,8 @@ def ground_details_page(request, turf_id):
 def delete_ground(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     if request.method == 'POST':
-        # Delete the ground object from the database
         ground.delete()
+
     return redirect('ground_details_page', turf_id=ground.turf.id)
 
 
@@ -333,7 +307,6 @@ def delete_turf_admin(request, turf_id):
         turf = TurfDetails.objects.get(pk=turf_id)
         turf.delete()
     except TurfDetails.DoesNotExist:
-        # Handle the case if the turf with the given ID does not exist
         pass
 
     return redirect('list_turf_details')
@@ -370,7 +343,7 @@ def add_time_slot_admin(request):
         date_from = datetime.strptime(request.POST.get('date_from'), '%Y-%m-%d')
         date_to = datetime.strptime(request.POST.get('date_to'), '%Y-%m-%d')
 
-        # Convert start_time and end_time to datetime objects
+        
         start_datetime = datetime.strptime(start_time, '%H:%M')
         end_datetime = datetime.strptime(end_time, '%H:%M')
 
@@ -380,7 +353,7 @@ def add_time_slot_admin(request):
         # Calculate the number of days in the date range
         num_days = (date_to - date_from).days + 1
         
-        # Save the time slots for each day within the date range
+        
         for _ in range(num_days):
             current_datetime = start_datetime  # Reset for each new day
             for i in range(time_slot_count):
@@ -397,10 +370,8 @@ def add_time_slot_admin(request):
             date_from += timedelta(days=1)
             start_datetime = datetime.strptime(start_time, '%H:%M')
 
-        # Redirect to a success page after successful data submission
         return redirect('success_page_admin')
 
-    # If the request method is GET, render the form page
     return render(request, 'admin/timeslot_admin.html', context={})
 
 
@@ -424,10 +395,8 @@ def ground_list(request, turf_id):
 def timeslot_list(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     timeslots = TimeSlot.objects.filter(ground=ground)
-    
-    # Number of items to display per page
+
     items_per_page = 20
-    
     paginator = Paginator(timeslots, items_per_page)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -439,7 +408,7 @@ def timeslot_list(request, ground_id):
 @login_required
 def delete_timeslot_admin(request, timeslot_id):
     timeslot = get_object_or_404(TimeSlot, pk=timeslot_id)
-    ground_id = timeslot.ground.id  # Assuming Timeslot model has a foreign key to the Ground model
+    ground_id = timeslot.ground.id 
 
     if request.method == 'POST':
         timeslot.delete()
@@ -484,18 +453,11 @@ def ground_list_reservation(request,turf_id):
 @login_required
 def select_date_and_reservations(request, ground_id):
     selected_date = request.GET.get('selected_date')
-
-    # Convert the selected_date to a Python datetime object if it exists
     if selected_date:
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
 
-    # Get the specific ground based on the ground_id
     ground = get_object_or_404(Ground, id=ground_id)
-
-    # Filter reservations for the selected date and ground
     reservations = Reservation.objects.filter(ground=ground, time_slot__date=selected_date) if selected_date else []
-
-    # Render the template with the necessary context
     return render(request, 'admin/ground_reservation_details.html', {'ground': ground, 'selected_date': selected_date, 'reservations': reservations})
 
 
@@ -508,7 +470,6 @@ def booking_page(request):
     context = {
         'all_bookings': all_bookings
     }
-    
     return render(request, 'admin/bookings_admin.html', context)
 
 
@@ -529,16 +490,9 @@ def sort_by_date(request):
 
 @login_required
 def payments_admin(request):
-    # Get all bookings for rendering in the template, excluding admin-related bookings
     all_bookings = Bookings.objects.exclude(reservation__ground__turf__added_by__user_type=1).order_by('-timestamp')
-
-    # Create a Paginator instance with 10 items per page
     paginator = Paginator(all_bookings, 10)
-
-    # Get the current page number from the request's GET parameters
     page_number = request.GET.get('page')
-
-    # Get the Page object for the current page number
     page = paginator.get_page(page_number)
 
     for booking in page:
@@ -548,27 +502,18 @@ def payments_admin(request):
             turf = ground.turf
             added_by = turf.added_by
 
-            # Check if the user has a related Clients object
             if hasattr(added_by, 'clients'):
                 commission_percentage = added_by.clients.commission_percentage
-
-                # Calculate commission based on the percentage
                 commission = (commission_percentage / 100) * booking.amount
-
-                # Do something with the commission
                 amount_to_client = booking.amount - commission
-
-                # Save the commission details to the database
                 booking.commission = commission
                 booking.amount_to_client = amount_to_client
                 booking.save()
 
             else:
-                # Handle the case where the user has no related Clients object
                 pass
 
         except (Bookings.DoesNotExist, Clients.DoesNotExist):
-            # Handle the case where the booking or Clients object does not exist
             pass
 
     context = {
@@ -581,7 +526,6 @@ def payments_admin(request):
 
 @login_required
 def admins_only_payments(request):
-    # Get all admin bookings for rendering in the template
     admin_bookings =Bookings.objects.exclude(reservation__ground__turf__added_by__user_type=2).order_by('-timestamp')
 
     context = {

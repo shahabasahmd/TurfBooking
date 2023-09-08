@@ -54,7 +54,7 @@ urlpatterns = [
     path('turf-reservation/<int:turf_id>/grounds/', admin_views.ground_list_reservation, name='groundlist_reservation_admin'),
     path('admin/select_date_and_reservations/<int:ground_id>/', admin_views.select_date_and_reservations, name='select_date_and_reservations'),
     path('admin/bookings/',admin_views.booking_page,name='bookings_page_admin'),
-     path('sort-by-turf/', admin_views.sort_by_turf, name='sort-by-turf'),
+    path('sort-by-turf/', admin_views.sort_by_turf, name='sort-by-turf'),
     path('sort-by-date/', admin_views.sort_by_date, name='sort-by-date'),
     path('payments-admin/', admin_views.payments_admin, name='payments-admin'),
     path('payments_admin_only/', admin_views.admins_only_payments, name='payments_admin_only'),
@@ -62,7 +62,7 @@ urlpatterns = [
     path('enquiry-list/', admin_views.enquiry_list, name='enquiry_list'),
     path('enquiries/<int:pk>/delete/', admin_views.delete_enquiry, name='delete-enquiry'),
     
-    
+
 
     # client section
     path("success-client",client_views.success_page_client,name='success_page_client'),
@@ -98,18 +98,11 @@ urlpatterns = [
     path('payment-history/completed/', client_views.completed_payments, name='sort-completed-bookings'),
     
 
-
-    
-
-    
-    
-    
     # users section
     path("",users_views.home,name='home'),
     path('about/', users_views.about,name="about"),
     path('registeruser/', views.show_register,name="showregisterpage"),
     path('saveuser/', users_views.add_user_save,name="saveuserdetails"),
-   
     path('turf-list-user/', users_views.turf_list,name="turf_list_user"),
     path('turf-details/<int:turf_id>/', users_views.turf_details_user, name='turf_details_user'),
     path('available_time_slots/<int:ground_id>/', users_views.available_time_slots, name='available_time_slots'),
@@ -127,15 +120,4 @@ urlpatterns = [
     path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='user/password_reset_confirm.html', form_class=MySetPasswordForm), name='password_reset_confirm'),
     path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(template_name = 'user/password_reset_complete.html'),name='password_reset_complete'),
 
-
-    
-   
-    
-
-
-    
-    
-
-
-    
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

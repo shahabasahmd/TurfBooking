@@ -1,78 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-    {% load static %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-inner slimscroll">
-           <div id="sidebar-menu" class="sidebar-menu">
-              <ul>
-               <li>
-                  <a href="{% url 'client_dashboard' %}"> <span>Dashborad</span></a>
-               </li>
-                 <li class="menu-title">
-                    <span>Main Menu</span>
-                 </li>
-                 
-                 <li class="submenu">
-                    <a href="#"><i class=" fas fa-chalkboard-teacher"></i> <span> Profile</span> <span class="menu-arrow"></span></a>
-                    <ul>
-                       <li><a href="{% url 'clienthome' %}">My Profile</a></li>
-                    </ul>
-                 </li>
-                 <li class="submenu">
-                    <a href="#"><i class="fas fa-user"></i> <span> Customers</span> <span class="menu-arrow"></span></a>
-                    <ul>
-                       <li><a href="{% url 'customer_list_client' %}">Customers List</a></li>
-                    </ul>
-                 </li>
-                 <li class="submenu">
-                    <a href="#"><i class="fas fa-building"></i> <span> Turf</span> <span class="menu-arrow"></span></a>
-                    <ul>
-                       <li><a href="{% url 'client_turf_list' %}">Turf List</a></li>
-                       <li><a href="{% url 'add_turf_client' %}">Turf Add</a></li>
-                       
-                    </ul>
-                 </li>
-                 <li class="submenu">
-                    <a href="#"><i class="fas fa-clock"></i> <span> Time Slots</span> <span class="menu-arrow"></span></a>
-                    <ul>
-                       <li><a href="{% url 'turf_list_for_timeslot_client' %}">Time Slot List</a></li>
-                       <li><a href="{% url 'turf_list_timeslot_client' %}"> Add Time slot</a></li>
-                       
-                    </ul>
-                 </li>
-                 <li class="menu-title">
-                    <span>Management</span>
-                 </li>
-                 
-                 <li>
-                    <a href="{% url 'turf_list_reservation_client' %}"><i class="fas fa-holly-berry"></i> <span>Reservations</span></a>
-                 </li>
-                 <li>
-                    <a href="{% url 'client_bookings' %}"><i class="fas fa-comment-dollar"></i> <span>Bookings</span></a>
-                 </li>
-                 <li>
-                    <a href="{% url 'paymentlist_client' %}"><i class="fas fa-clipboard-list"></i> <span>Payments</span></a>
-                 </li>
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-              </ul>
-           </div>
-        </div>
-     </div>
-    
-</body>
+   {% load static %}
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+   </head>
+   <body>
+      <div class="sidebar" id="sidebar">
+         <div class="sidebar-inner slimscroll">
+            <div id="sidebar-menu" class="sidebar-menu">
+               <ul>
+                  <li>
+                     <a href="{% url 'client_dashboard' %}"> <span>Dashborad</span></a>
+                  </li>
+                  <li class="menu-title">
+                     <span>Main Menu</span>
+                  </li>
+                  <li class="submenu">
+                     <a href="#"><i class=" fas fa-chalkboard-teacher"></i> <span> Profile</span> <span class="menu-arrow"></span></a>
+                     <ul>
+                        <li><a href="{% url 'clienthome' %}">My Profile</a></li>
+                     </ul>
+                  </li>
+                  <li class="submenu">
+                     <a href="#"><i class="fas fa-user"></i> <span> Customers</span> <span class="menu-arrow"></span></a>
+                     <ul>
+                        <li><a href="{% url 'customer_list_client' %}">Customers List</a></li>
+                     </ul>
+                  </li>
+                  <li class="submenu">
+                     <a href="#"><i class="fas fa-building"></i> <span> Turf</span> <span class="menu-arrow"></span></a>
+                     <ul>
+                        <li><a href="{% url 'client_turf_list' %}">Turf List</a></li>
+                        <li><a href="{% url 'add_turf_client' %}">Turf Add</a></li>
+                     </ul>
+                  </li>
+                  <li class="submenu">
+                     <a href="#"><i class="fas fa-clock"></i> <span> Time Slots</span> <span class="menu-arrow"></span></a>
+                     <ul>
+                        <li><a href="{% url 'turf_list_for_timeslot_client' %}">Time Slot List</a></li>
+                        <li><a href="{% url 'turf_list_timeslot_client' %}"> Add Time slot</a></li>
+                     </ul>
+                  </li>
+                  <li class="menu-title">
+                     <span>Management</span>
+                  </li>
+                  <li>
+                     <a href="{% url 'turf_list_reservation_client' %}"><i class="fas fa-holly-berry"></i> <span>Reservations</span></a>
+                  </li>
+                  <li>
+                     <a href="{% url 'client_bookings' %}"><i class="fas fa-comment-dollar"></i> <span>Bookings</span></a>
+                  </li>
+                  <li>
+                     <a href="{% url 'paymentlist_client' %}"><i class="fas fa-clipboard-list"></i> <span>Payments</span></a>
+                  </li>
+               </ul>
+            </div>
+         </div>
+      </div>
+   </body>
 </html>

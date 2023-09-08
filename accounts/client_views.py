@@ -8,15 +8,13 @@ from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 from django.db.models import Sum,Count
 from django.db.models.functions import TruncMonth
+from decimal import Decimal
+import json
 
 @login_required
 def success_page_client(request):
     return render(request,'client/clientinclude/success_client.html')
 
-from decimal import Decimal
-
-import json
-from django.db.models.functions import ExtractMonth, ExtractYear
 
 
 @login_required
@@ -27,7 +25,7 @@ def client_dashboard(request):
     total_profit = Bookings.objects.filter(turf_added_by=user, payment_status='completed').aggregate(total_profit=Sum('amount_to_client'))['total_profit'] or Decimal('0.00')
     total_pending_transactions = Bookings.objects.filter(turf_added_by=user, payment_status='pending').count()
     
-    # Retrieve monthly profit data
+    
     monthly_profit_data = Bookings.objects.filter(
         turf_added_by=user,
         payment_status='completed',
@@ -39,7 +37,7 @@ def client_dashboard(request):
         total_profit=Sum('amount_to_client')
     ).order_by('month')
 
-    # Retrieve monthly booking data
+   
     monthly_booking_data = Bookings.objects.filter(
         turf_added_by=user,
     ).annotate(
@@ -50,7 +48,7 @@ def client_dashboard(request):
         total_bookings=Count('id')
     ).order_by('month')
 
-    # Prepare data for the charts
+   
     profit_labels = [entry['month'].strftime('%b %Y') for entry in monthly_profit_data]
     profit_values = [float(entry['total_profit'] or 0) for entry in monthly_profit_data]
 
@@ -60,7 +58,7 @@ def client_dashboard(request):
     context = {
         'total_turfs': total_turfs,
         'total_grounds': total_grounds,
-        'total_profit': float(total_profit),  # Convert total_profit to float
+        'total_profit': float(total_profit),  
         'total_pending_transactions': total_pending_transactions,
         'profit_labels': json.dumps(profit_labels),
         'profit_values': json.dumps(profit_values),
@@ -80,15 +78,15 @@ def clienthome(request ):
 
 @login_required
 def edit_profile(request):
-    # Assuming you have a one-to-one relationship between User and Clients
     client = get_object_or_404(Clients, admin=request.user)
-
     context = {
         'client': client,
     }
 
     return render(request, 'client/edit_profile.html', context)
 
+
+@login_required
 def update_profile(request):
     if request.method == 'POST':
         mobile = request.POST.get('mobile')
@@ -96,10 +94,10 @@ def update_profile(request):
         account_details = request.POST.get('account_details')
         upi_num_or_id = request.POST.get('upi')
 
-        # Get the current user
+        
         user = request.user
 
-        # Check if the user is a client
+        
         if user.is_authenticated :
             client = Clients.objects.get(admin=user)
             client.mobile = mobile
@@ -108,11 +106,10 @@ def update_profile(request):
             client.upi_num_or_id = upi_num_or_id
             client.save()
             messages.success(request, 'Your personal details have been updated successfully.')
-            return redirect('success_page_client')  # Redirect to the client's profile page after successful update
+            return redirect('success_page_client') 
         else:
             messages.error(request, 'You do not have permission to perform this action.')
     else:
-        # Handle GET request or other methods if needed
         pass
 
     return render(request, 'client/edit_profile.html')
@@ -123,7 +120,6 @@ def change_password_view(request):
     if request.method == 'POST':
         current_password = request.POST.get('current_password')
         new_password = request.POST.get('new_password')
-
         
         user = request.user
         if user.check_password(current_password):
@@ -176,13 +172,11 @@ def add_turf_save_client(request):
         shower = request.POST.get('shower')
         image = request.FILES.get('turf_image')
 
-        
         try:
             place = Places.objects.get(place=place_name)
         except Places.DoesNotExist:
             place = None
-
-       
+        
         if place is not None:
             turf = TurfDetails.objects.create(
                 added_by=request.user,  
@@ -227,7 +221,6 @@ def save_ground_client(request):
         price = request.POST.get('price')
         
         
-        user_id = request.user.id
         ground = Ground(
             turf_id=turf_id,
             category=category,
@@ -285,7 +278,6 @@ def delete_turf_confirmation(request, turf_id):
 
 @login_required
 def client_turf_list_timeslot(request):
-
     turfs = TurfDetails.objects.filter(added_by=request.user)
     context = {
         'turfs': turfs,
@@ -309,14 +301,14 @@ def add_time_slot_client(request):
         date_from = datetime.strptime(request.POST.get('date_from'), '%Y-%m-%d')
         date_to = datetime.strptime(request.POST.get('date_to'), '%Y-%m-%d')
 
-        # Convert start_time and end_time to datetime objects
+       
         start_datetime = datetime.strptime(start_time, '%H:%M')
         end_datetime = datetime.strptime(end_time, '%H:%M')
 
-        # Calculate the number of time slots to create
+       
         time_slot_count = int((end_datetime - start_datetime).seconds / (match_duration * 3600))
 
-        # Calculate the number of days in the date range
+        
         num_days = (date_to - date_from).days + 1
         
         # Save the time slots for each day within the date range
@@ -335,11 +327,7 @@ def add_time_slot_client(request):
             # Move to the next day and reset start_datetime
             date_from += timedelta(days=1)
             start_datetime = datetime.strptime(start_time, '%H:%M')
-
-        # Redirect to a success page after successful data submission
         return redirect('success_page_client')
-
-    # If the request method is GET, render the form page
     return render(request, 'client/timeslotpage_client.html', context={})
 
 
@@ -363,17 +351,9 @@ def ground_list(request, turf_id):
 def timeslot_list(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     all_timeslots = TimeSlot.objects.filter(ground=ground)
-    
-    # Set the number of items to display per page
     items_per_page = 20
-    
-    # Create a Paginator object
     paginator = Paginator(all_timeslots, items_per_page)
-    
-    # Get the requested page number from the URL parameter
     page_number = request.GET.get('page')
-    
-    # Get the Page object for the requested page number
     timeslots = paginator.get_page(page_number)
     
     return render(request, 'client/list_timeslot_client.html', {'ground': ground, 'timeslots': timeslots})
@@ -382,7 +362,7 @@ def timeslot_list(request, ground_id):
 @login_required
 def delete_timeslot_client(request, timeslot_id):
     timeslot = get_object_or_404(TimeSlot, pk=timeslot_id)
-    ground_id = timeslot.ground.id  # Assuming Timeslot model has a foreign key to the Ground model
+    ground_id = timeslot.ground.id  
 
     if request.method == 'POST':
         timeslot.delete()
@@ -412,24 +392,17 @@ def ground_list_reservation(request,turf_id):
 def select_date_and_reservations(request, ground_id):
     selected_date = request.GET.get('selected_date')
 
-    # Convert the selected_date to a Python datetime object if it exists
     if selected_date:
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
-
-    # Get the specific ground based on the ground_id
     ground = get_object_or_404(Ground, id=ground_id)
-
-    # Filter reservations for the selected date and ground
     reservations = Reservation.objects.filter(ground=ground, time_slot__date=selected_date) if selected_date else []
-
-    # Render the template with the necessary context
     return render(request, 'client/ground_reservation_details_client.html', {'ground': ground, 'selected_date': selected_date, 'reservations': reservations})
 
 
 
 @login_required
 def bookings_client(request):
-    logged_in_client = request.user  # Assuming the logged-in user is a CustomUser
+    logged_in_client = request.user 
     client_bookings = Bookings.objects.filter(turf_added_by=logged_in_client)
     
     context = {
@@ -441,8 +414,8 @@ def bookings_client(request):
 
 @login_required
 def paymentlist_client(request):
-    logged_in_client = request.user  # Assuming the logged-in user is a CustomUser
-    client = Clients.objects.get(admin=logged_in_client)  # Get the client object associated with the logged-in user
+    logged_in_client = request.user  
+    client = Clients.objects.get(admin=logged_in_client) 
     client_bookings = Bookings.objects.filter(turf_added_by=logged_in_client)
     
     # Calculate the client's amount for each booking

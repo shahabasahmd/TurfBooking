@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from .models import *
 from django.http import HttpResponse
 from django.contrib import messages
-from django.conf import settings
+import datetime
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.encoding import force_str
@@ -18,7 +18,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .forms import PasswordResetForm
 from django.contrib.auth import login
-import pyotp
+
 
 def home(request):
     return render(request,'user/home.html',locals())
@@ -44,10 +44,8 @@ def add_user_save(request):
 
         if CustomUser.objects.filter(email=email).exists():
             return HttpResponse("Email already taken", status=400)
-            
         elif CustomUser.objects.filter(username=username).exists():
             return HttpResponse("Username already taken", status=400)
-            
         else:
             user = CustomUser.objects.create_user(
                 first_name=first_name,
@@ -57,51 +55,29 @@ def add_user_save(request):
                 password=password,
                 user_type=3
             )
-
-            # Check if a Customers object exists for the admin
             customers, created = Customers.objects.get_or_create(admin=user)
             if not created:
-                # Update the existing Customers object
                 customers.address = address
                 customers.mobile = mobile
                 customers.save()
             else:
-                # Set mobile and address for the new Customers object
                 customers.mobile = mobile
                 customers.address = address
                 customers.save()
 
-            # Log the user in
             login(request, user)
-
             messages.success(request, "Your account was created successfully")
-            return redirect('loginpage')  # Redirect to the appropriate page
+            return redirect('loginpage') 
 
-    # If the request method is not "POST", you can render the registration page
     return render(request, 'registration/register.html')
-@login_required
-def turf_list(request):
-    user_selected_place = request.GET.get('place')  # Get the selected place from the query parameter
-    turfs = TurfDetails.objects.filter(place__place=user_selected_place) if user_selected_place else TurfDetails.objects.all()
-    return render(request, 'user/turf_list.html', {'turfs': turfs})
-
 
 
 @login_required
 def turf_list(request):
-    user_selected_place = request.GET.get('place')  # Get the selected place from the query parameter
+    user_selected_place = request.GET.get('place')  
     turfs = TurfDetails.objects.filter(place__place=user_selected_place) if user_selected_place else TurfDetails.objects.all()
     return render(request, 'user/turf_list.html', {'turfs': turfs})
-
-
-@login_required
-def turf_list(request):
-    user_selected_place = request.GET.get('place')  # Get the selected place from the query parameter
-    turfs = TurfDetails.objects.filter(place__place=user_selected_place) if user_selected_place else TurfDetails.objects.all()
-    return render(request, 'user/turf_list.html', {'turfs': turfs})
-
    
-
 @login_required
 def turf_details_user(request, turf_id):
     turf = get_object_or_404(TurfDetails, id=turf_id)
@@ -114,9 +90,6 @@ def turf_details_user(request, turf_id):
 def available_time_slots(request, ground_id):
     ground = get_object_or_404(Ground, id=ground_id)
     time_slots = TimeSlot.objects.filter(ground=ground)
-
-    # You can do any additional processing or filtering here if needed
-
     return render(request, 'user/list_timeslot_user.html', {'ground': ground, 'time_slots': time_slots})
 
 
@@ -128,18 +101,12 @@ def timeslot_list_user(request):
     ground_id = request.GET.get('ground_id')
 
     if selected_date and ground_id:
-        # Convert the selected_date to a Python datetime object
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
-
-       
         ground = get_object_or_404(Ground, id=ground_id)
-
-        
         timeslots = TimeSlot.objects.filter(ground=ground, date=selected_date, is_available=True)
     else:
         ground = None
         timeslots = TimeSlot.objects.none()
-
     return render(request, 'user/list_timeslot_user.html', {'ground': ground, 'timeslots': timeslots, 'selected_date': selected_date})
 
 
@@ -165,18 +132,16 @@ def reserve_timeslots(request):
             return HttpResponse("error") 
 
         reservation_details_list = []
-
-        # List of possible date formats to try
         date_formats = ['%b. %d, %Y', '%B %d, %Y']
 
         selected_date = None
         for date_format in date_formats:
             try:
                 selected_date = datetime.strptime(selected_date_str.replace('Sept', 'Sep'), date_format).strftime('%Y-%m-%d')
-                break  # Break out of the loop if a valid format is found
+                break  
             except ValueError as e:
                 print(f"Error parsing date with format {date_format}: {e}")
-                pass  # Try the next format
+                pass  
         
         if selected_date is None:
             return HttpResponse("Invalid date format")
@@ -186,7 +151,6 @@ def reserve_timeslots(request):
                 time_slot_id = int(time_slot_id_str)
                 time_slot = TimeSlot.objects.get(pk=time_slot_id)
             except (ValueError, TimeSlot.DoesNotExist):
-                # Skip invalid time slot IDs or non-existent time slots
                 continue
 
             existing_reservation = Reservation.objects.filter(
@@ -225,12 +189,11 @@ def reserve_timeslots(request):
 def reservation_success_user(request):
     customer = Customers.objects.get(admin=request.user)
     reservations = Reservation.objects.filter(customer=customer)
-
     reservation_details_list = []
     total_amount = 0
 
     for reservation in reservations:
-        if reservation.time_slot.is_available:  # Check availability
+        if reservation.time_slot.is_available: 
             reservation_details = {
                 'id': reservation.id,
                 'turf_name': reservation.ground.turf.turf_name,
@@ -245,14 +208,12 @@ def reservation_success_user(request):
             if reservation_details['ground_price']:
                 total_amount += float(reservation_details['ground_price'])
 
-    razoramount = int(total_amount * 100)  # Calculate outside the loop
-
+    razoramount = int(total_amount * 100)  
     context = {
         'reservation_details_list': reservation_details_list,
         'total_amount': total_amount,
         'razoramount': razoramount,
     }
-
     return render(request, 'user/reservation_details_user.html', context)
 
 
@@ -270,7 +231,6 @@ def save_payment(request):
                 return JsonResponse({'status': 'error', 'message': 'Reservation not found'})
 
             customer = request.user.customer
-
             payment = Bookings.objects.create(
                 customer=customer,
                 reservation=reservation,
@@ -289,7 +249,7 @@ def save_payment(request):
 def payment_done(request):
     if request.method == 'GET':
         payment_id = request.GET.get('payment_id')
-        reservation_ids = request.GET.get('reservation_ids')  # Change to 'reservation_ids' plural
+        reservation_ids = request.GET.get('reservation_ids')
 
         if not payment_id:
             return JsonResponse({'status': 'error', 'message': 'Payment ID is missing'})
@@ -299,33 +259,26 @@ def payment_done(request):
 
         try:
             customer = Customers.objects.get(admin=request.user)
-
-            # Split the reservation_ids string into a list of integers
             reservation_id_list = [int(reservation_id) for reservation_id in reservation_ids.split(',')]
-
             with transaction.atomic():
                 total_amount = 0
                 for reservation_id in reservation_id_list:
                     try:
                         reservation = Reservation.objects.get(id=reservation_id)
                         total_amount += reservation.ground.price
-
-                        # Create a booking for each selected reservation
                         payment = Bookings.objects.create(
                             customer=customer,
                             reservation=reservation,
                             razorpay_payment_id=payment_id,
                             amount=reservation.ground.price,
-                            turf_added_by=reservation.ground.turf.added_by,  # Set the added_by field
-                            payment_status='pending',  # Set the payment status
+                            turf_added_by=reservation.ground.turf.added_by,  
+                            payment_status='pending', 
                         )
-
-                        # Mark the associated time slot as not available
                         time_slot = reservation.time_slot
                         time_slot.is_available = False
                         time_slot.save()
                     except Reservation.DoesNotExist:
-                        pass  # Ignore non-existent reservations
+                        pass  
 
             
             return redirect('booking_history')
@@ -343,33 +296,27 @@ def payment_done(request):
 
 @login_required
 def booking_history(request):
-    # Fetch the bookings for the logged-in customer
     customer = request.user.customers
     bookings = Bookings.objects.filter(customer=customer).order_by('-timestamp')
-
     context = {
         'bookings': bookings
     }
-
     return render(request, 'user/booking_history.html', context)
 
 
 
 def enquiry_view(request):
     if request.method == 'POST':
-        name = request.POST.get('name')  # Get the name input value
-        place = request.POST.get('place')  # Get the place input value
+        name = request.POST.get('name') 
+        place = request.POST.get('place')  
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         message = request.POST.get('message')
 
         enquiry = Enquiry(name=name, place=place, email=email, phone=phone, message=message)
         enquiry.save()
-
         messages.success(request, "Your information has been received. Our team will contact you soon.")
-
         return render(request, 'user/home.html')    
-
     return render(request, 'user/home.html')
 
 
@@ -395,7 +342,7 @@ def change_password(request):
             request.user.save()
             update_session_auth_hash(request, request.user)
             messages.success(request, 'Your password was successfully changed!')
-            return redirect('profile')  # Update this with the appropriate URL
+            return redirect('profile') 
     
     return render(request, 'user/change_password.html')
 
@@ -410,10 +357,10 @@ def send_reset_link(request):
             email = form.cleaned_data['email']
             user = User.objects.get(email=email)
 
-            # Create a password reset token and send the reset email
+            
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            reset_link = f"http://localhost:8000/reset-password/{uid}/{token}/"  # Adjust port if necessary
+            reset_link = f"http://localhost:8000/reset-password/{uid}/{token}/"
             subject = "Reset Your Password"
             message = render_to_string('password_reset_email.html', {
                 'user': user,
@@ -442,7 +389,7 @@ def reset_password(request, uidb64, token):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Your password has been reset successfully.')
-                return redirect('dologin')  # Redirect to the login page after resetting the password
+                return redirect('dologin') 
         else:
             form = SetPasswordForm(user)
         return render(request, 'user/reset_password.html', {'form': form})

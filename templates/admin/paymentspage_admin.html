@@ -1,116 +1,108 @@
 {% extends 'admin/adminbase.html' %}
 {% block tile %}Bookings{% endblock tile %}
 {% block maincontent %}
-
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <div class="col-auto text-right float-right ml-auto">
-    <div class="btn-group">
-        <select id="sort-by-select" class="form-control">
-            <option value="turf">Sort by Turf</option>
-            <option value="date">Sort by Date</option>
-        </select>
-    </div>
+   <div class="btn-group">
+      <select id="sort-by-select" class="form-control">
+         <option value="turf">Sort by Turf</option>
+         <option value="date">Sort by Date</option>
+      </select>
+   </div>
 </div>
 <div class="content container-fluid">
-    <h2>Payment History</h2>
-    
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card card-table">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-center mb-0 datatable">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th class="font-weight-bold text-primary">Customer</th>
-                                    <th class="font-weight-bold text-primary">Client Name</th>
-                                    <th class="font-weight-bold text-primary">Commession <br> in %</th>
-                                    <th class="font-weight-bold text-primary">Turf Name</th>
-                                    <th class="font-weight-bold text-primary">Ground Name</th>
-                                    <th class="font-weight-bold text-primary">Selected Date</th>
-                                    <th class="font-weight-bold text-primary">Time Slot</th>
-                                    <th class="font-weight-bold text-primary">Razorpay Payment ID</th>
-                                    <th class="font-weight-bold text-primary">Total <br>Amount</th>
-                                    <th class="font-weight-bold text-primary">Amount  <br>To client </th>
-                                    <th class="font-weight-bold text-primary">Commession </th>
-                                    <th class="font-weight-bold text-primary">Payment Status</th>
-                                    <th class="font-weight-bold text-primary">Timestamp</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for booking in all_bookings %}
-                                <tr>
-                                    <td>{{ booking.customer.admin.username }}</td>
-                                    <td>{{ booking.reservation.ground.turf.added_by.username }}</td>
-                                    <td>{{ booking.reservation.ground.turf.added_by.clients.commission_percentage }} %</td>
-                                    <td>{{ booking.reservation.ground.turf.turf_name }}</td>
-                                    <td>{{ booking.reservation.ground.ground_name }}</td>
-                                    <td>{{ booking.reservation.time_slot.date }}</td>
-                                    <td>
-                                        {{ booking.reservation.time_slot.start_time|date:"h:i A" }} -<br> 
-                                        {{ booking.reservation.time_slot.end_time|date:"h:i A" }}
-                                    </td>
-                                    <td>{{ booking.razorpay_payment_id }}</td>
-                                    <td>{{ booking.amount }}</td>
-                                    <td>{{ booking.amount_to_client }}</td>
-                                    <td>{{ booking.commission }}</td>
-                                    {% if not is_admin %}
-<td>
-    <select name="payment_status" id="payment_status_{{ booking.id }}" class="form-control payment-status-select {% if booking.payment_status == 'completed' %}text-success{% elif booking.payment_status == 'pending' %}text-danger{% endif %}" data-booking-id="{{ booking.id }}">
-        {% for status_value, status_label in booking.PAYMENT_CHOICES %}
-            <option value="{{ status_value }}" {% if booking.payment_status == status_value %}selected{% endif %}>{{ status_label }}</option>
-        {% endfor %}
-    </select>
-</td>
-{% endif %}
-                                    <td>{{ booking.payment_status_timestamp }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        
-                    </div>
-                </div>
-                
-                
+   <h2>Payment History</h2>
+   <div class="row">
+      <div class="col-sm-12">
+         <div class="card card-table">
+            <div class="card-body">
+               <div class="table-responsive">
+                  <table class="table table-hover table-bordered table-center mb-0 datatable">
+                     <thead class="thead-dark">
+                        <tr>
+                           <th class="font-weight-bold text-primary">Customer</th>
+                           <th class="font-weight-bold text-primary">Client Name</th>
+                           <th class="font-weight-bold text-primary">Commession <br> in %</th>
+                           <th class="font-weight-bold text-primary">Turf Name</th>
+                           <th class="font-weight-bold text-primary">Ground Name</th>
+                           <th class="font-weight-bold text-primary">Selected Date</th>
+                           <th class="font-weight-bold text-primary">Time Slot</th>
+                           <th class="font-weight-bold text-primary">Razorpay Payment ID</th>
+                           <th class="font-weight-bold text-primary">Total <br>Amount</th>
+                           <th class="font-weight-bold text-primary">Amount  <br>To client </th>
+                           <th class="font-weight-bold text-primary">Commession </th>
+                           <th class="font-weight-bold text-primary">Payment Status</th>
+                           <th class="font-weight-bold text-primary">Timestamp</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {% for booking in all_bookings %}
+                        <tr>
+                           <td>{{ booking.customer.admin.username }}</td>
+                           <td>{{ booking.reservation.ground.turf.added_by.username }}</td>
+                           <td>{{ booking.reservation.ground.turf.added_by.clients.commission_percentage }} %</td>
+                           <td>{{ booking.reservation.ground.turf.turf_name }}</td>
+                           <td>{{ booking.reservation.ground.ground_name }}</td>
+                           <td>{{ booking.reservation.time_slot.date }}</td>
+                           <td>
+                              {{ booking.reservation.time_slot.start_time|date:"h:i A" }} -<br> 
+                              {{ booking.reservation.time_slot.end_time|date:"h:i A" }}
+                           </td>
+                           <td>{{ booking.razorpay_payment_id }}</td>
+                           <td>{{ booking.amount }}</td>
+                           <td>{{ booking.amount_to_client }}</td>
+                           <td>{{ booking.commission }}</td>
+                           {% if not is_admin %}
+                           <td>
+                              <select name="payment_status" id="payment_status_{{ booking.id }}" class="form-control payment-status-select {% if booking.payment_status == 'completed' %}text-success{% elif booking.payment_status == 'pending' %}text-danger{% endif %}" data-booking-id="{{ booking.id }}">
+                              {% for status_value, status_label in booking.PAYMENT_CHOICES %}
+                              <option value="{{ status_value }}" {% if booking.payment_status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                              {% endfor %}
+                              </select>
+                           </td>
+                           {% endif %}
+                           <td>{{ booking.payment_status_timestamp }}</td>
+                        </tr>
+                        {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
             </div>
-        </div>
-        
-    </div>
+         </div>
+      </div>
+   </div>
 </div>
 <script>
-    $(document).ready(function() {
-        $('.payment-status-select').change(function() {
-            var bookingId = $(this).data('booking-id');
-            var newStatus = $(this).val();
-
-            $.ajax({
-                type: 'POST',
-                url: '{% url "update-payment-status" %}',
-                data: {
-                    'booking_id': bookingId,
-                    'new_status': newStatus,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}',
-                },
-                success: function(data) {
-                    // Handle success response, if needed
-                    if (data.message) {
-                        console.log(data.message);
-                    }
-                },
-                error: function(data) {
-                    // Handle error response, if needed
-                    if (data.error) {
-                        console.error(data.error);
-                    }
-                }
-            });
-       
-        });
-    });
+   $(document).ready(function() {
+       $('.payment-status-select').change(function() {
+           var bookingId = $(this).data('booking-id');
+           var newStatus = $(this).val();
+   
+           $.ajax({
+               type: 'POST',
+               url: '{% url "update-payment-status" %}',
+               data: {
+                   'booking_id': bookingId,
+                   'new_status': newStatus,
+                   'csrfmiddlewaretoken': '{{ csrf_token }}',
+               },
+               success: function(data) {
+                   // Handle success response, if needed
+                   if (data.message) {
+                       console.log(data.message);
+                   }
+               },
+               error: function(data) {
+                   // Handle error response, if needed
+                   if (data.error) {
+                       console.error(data.error);
+                   }
+               }
+           });
+      
+       });
+   });
 </script>
-
-
 {% endblock maincontent %}

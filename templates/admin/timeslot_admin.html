@@ -3,7 +3,7 @@
 {% block maincontent %}
 
 <div class="content container-fluid">
-    <!-- Your existing form code -->
+    
     <form method="post" action="{% url 'add_time_slot_admin' %}" >
         {% csrf_token %}
         <div class="row">
@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            <!-- Add the following div to display the Ground Names dropdown -->
+            
             <div class="col-12 col-sm-6">
                 <div class="form-group">
                     <label>Ground Name</label>
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <!-- Your other form fields here -->
+           
             <div class="col-6 ">
                 <div class="form-group">
                     <label>Date Range</label>
