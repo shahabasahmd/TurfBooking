@@ -10,11 +10,12 @@ from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 from django.db.models import Sum
 from django.db.models.functions import ExtractMonth
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+import json
 
 def success_page(request):
     return render(request,'admin/admininclude/success_admin.html')
-
-
 
 @login_required
 def dashboard(request):
@@ -27,31 +28,44 @@ def dashboard(request):
     total_commission = Bookings.objects.aggregate(Sum('commission'))['commission__sum'] or 0
     total_profit = total_booking_amount + total_commission
 
-    revenue_data = Bookings.objects.filter(
-        turf_added_by=request.user,
-        payment_status='completed'
+    monthly_profit_data = Bookings.objects.annotate(
+    month=TruncMonth('timestamp')
+    ).values(
+    'month'
     ).annotate(
-        month=ExtractMonth('timestamp')
-    ).values('month').annotate(
-        monthly_revenue=Sum('amount')
-    ).order_by('month').values_list('monthly_revenue', flat=True)
+    total_profit=Sum('commission')
+    ).order_by('month')
 
     
-    bookings_data = Bookings.objects.annotate(
-    month=ExtractMonth('timestamp')
-    ).values('month').annotate(
-    monthly_bookings=Sum(1)
-    ).order_by('month').values_list('monthly_bookings', flat=True)
+
+    monthly_booking_data = Bookings.objects.annotate(
+    month=TruncMonth('timestamp')
+    ).values(
+    'month'
+    ).annotate(
+    total_bookings=Count('id')
+    ).order_by('month')
+
+    
+    profit_labels = [entry['month'].strftime('%b %Y') for entry in monthly_profit_data]
+    profit_values = [float(entry['total_profit'] or 0) for entry in monthly_profit_data]
+# Extract data for plotting
+    booking_labels = [entry['month'].strftime('%b %Y') for entry in monthly_booking_data]
+    booking_values = [entry['total_bookings'] for entry in monthly_booking_data]
 
     context = {
         'customer_count': customer_count,
         'clients_count': clients_count,
         'grounds_count': grounds_count,
         'total_profit': total_profit,
-          'revenue_data': list(revenue_data),
-        'bookings_data': list(bookings_data),
+        'profit_labels': json.dumps(profit_labels),
+        'profit_values': json.dumps(profit_values),
+        'booking_labels': json.dumps(booking_labels),
+        'booking_values': json.dumps(booking_values),
+        
     }
     return render(request, 'admin/admin_dashboard.html', context)
+
 
 @login_required(login_url='/')
 def adminhome(request):

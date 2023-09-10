@@ -76,81 +76,75 @@
       </div>
    </div>
    <div class="row">
-     <!-- Revenue Chart Column -->
-     <div class="col-md-6">
-         <div class="card card-chart">
-             <div class="card-header">
-                 <div class="row align-items-center">
-                     <div class="col-6">
-                         <h5 class="card-title">Revenue</h5>
-                     </div>
-                 </div>
-             </div>
-             <div class="card-body">
-                 <!-- Revenue Chart Container -->
-                 <div id="revenue-chart"></div>
-             </div>
-         </div>
-     </div>
-
-     <!-- Number of Bookings Chart Column -->
-     <div class="col-md-6">
-         <div class="card card-chart">
-             <div class="card-header">
-                 <div class="row align-items-center">
-                     <div class="col-6">
-                         <h5 class="card-title">Number of Bookings</h5>
-                     </div>
-                 </div>
-             </div>
-             <div class="card-body">
-                 <!-- Bookings Chart Container -->
-                 <div id="bookings-chart"></div>
-             </div>
-         </div>
-     </div>
- </div>
- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-
+      <div class="col-md-12 col-lg-6">
+          <div class="card">
+              <div class="card-header">
+                  <h5 class="card-title">Profit Chart</h5>
+              </div>
+              <div class="card-body">
+                  <div id="profit-chart"></div>
+              </div>
+          </div>
+      </div>
+  
+      <!-- Number of Bookings Chart -->
+      <div class="col-md-12 col-lg-6">
+          <div class="card">
+              <div class="card-header">
+                  <h5 class="card-title">Number of Bookings Chart</h5>
+              </div>
+              <div class="card-body">
+                  <div id="booking-chart"></div>
+              </div>
+          </div>
+      </div>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    // Dynamic data from Django context
-    var revenueData = {{ revenue_data|safe }};
-    var bookingsData = {{ bookings_data|safe }};
+document.addEventListener("DOMContentLoaded", function () {
+   // Fetch the data from Django context
+   const profitLabels = {{ profit_labels | safe }};
+   const profitValues = {{ profit_values | safe }};
+   const bookingLabels = {{ booking_labels | safe }};
+   const bookingValues = {{ booking_values | safe }};
 
-    // Initialize the revenue chart
-    var revenueChart = new ApexCharts(document.querySelector("#revenue-chart"), {
-        chart: {
-            type: 'area',
-        },
-        series: [{
-            name: "Revenue",
-            data: revenueData,
-        }],
-        xaxis: {
-            categories: ["Sep", "Oct", "Nov", "Dec"],
-        },
-    });
-    revenueChart.render();
+   // Create profit chart
+   const profitChartOptions = {
+       chart: {
+           type: "line",
+           height: 350,
+       },
+       xaxis: {
+           categories: profitLabels,
+       },
+       series: [
+           {
+               name: "Profit",
+               data: profitValues,
+           },
+       ],
+   };
+   new ApexCharts(document.querySelector("#profit-chart"), profitChartOptions).render();
 
-    // Initialize the bookings chart
-    var bookingsChart = new ApexCharts(document.querySelector("#bookings-chart"), {
-        chart: {
-            type: 'bar',
-        },
-        series: [{
-            name: "Bookings",
-            data: bookingsData,
-        }],
-        xaxis: {
-            categories: ["Sep", "Oct", "Nov", "Dec", "Jan", "Feb"],
-        },
-    });
-    bookingsChart.render();
+   // Create booking chart
+   const bookingChartOptions = {
+       chart: {
+           type: "bar",
+           height: 350,
+       },
+       xaxis: {
+           categories: bookingLabels,
+       },
+       series: [
+           {
+               name: "Number of Bookings",
+               data: bookingValues,
+           },
+       ],
+   };
+   new ApexCharts(document.querySelector("#booking-chart"), bookingChartOptions).render();
+});
 </script>
 
-   
-   
 
 {% endblock maincontent %}

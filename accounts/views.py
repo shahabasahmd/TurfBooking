@@ -37,7 +37,7 @@ def doLogin(request):
                 if user.user_type == "1":
                     return redirect('admin_dashboard')
                 elif user.user_type == "2":
-                    return redirect('clienthome')
+                    return redirect('client_dashboard')
                 elif user.user_type == "3":
                     return redirect('home')
         else:
