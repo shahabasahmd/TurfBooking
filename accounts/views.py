@@ -3,6 +3,7 @@ from .models import Customers
 from django.contrib.auth import login, logout
 from django.shortcuts import render
 from django.contrib import messages
+from django.views.decorators.cache import never_cache
 
 
 from accounts.EmailBackEnd import EmailBackEnd
@@ -24,6 +25,7 @@ def ShowLoginPage(request):
 def show_register(request):
     return render(request,'register.html')
 
+@never_cache
 def doLogin(request):
     if request.method == 'POST':
         user = EmailBackEnd.authenticate(request, username=request.POST.get("email"), password=request.POST.get("password"))
@@ -35,7 +37,7 @@ def doLogin(request):
             else:
                 login(request, user)
                 if user.user_type == "1":
-                    return redirect('admin_dashboard')
+                    return redirect('admin_dashborad')
                 elif user.user_type == "2":
                     return redirect('client_dashboard')
                 elif user.user_type == "3":

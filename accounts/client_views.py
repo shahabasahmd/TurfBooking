@@ -10,13 +10,14 @@ from django.db.models import Sum,Count
 from django.db.models.functions import TruncMonth
 from decimal import Decimal
 import json
+from django.views.decorators.cache import never_cache
 
 @login_required
 def success_page_client(request):
     return render(request,'client/clientinclude/success_client.html')
 
 
-
+@never_cache
 @login_required
 def client_dashboard(request):
     user = request.user

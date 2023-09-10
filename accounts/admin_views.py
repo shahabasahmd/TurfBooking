@@ -9,14 +9,16 @@ from django.shortcuts import get_object_or_404
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 from django.db.models import Sum
-from django.db.models.functions import ExtractMonth
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
 import json
+from django.views.decorators.cache import never_cache
 
 def success_page(request):
     return render(request,'admin/admininclude/success_admin.html')
 
+
+@never_cache
 @login_required
 def dashboard(request):
     customer_count = Customers.objects.count()
