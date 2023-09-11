@@ -1,16 +1,38 @@
 {% extends 'user/user_basefile.html' %}
 {% block tile %}Turf details{% endblock tile %}
 {% block customstyles %}
-
 <style>
-    /* Customize the search button's height */
-    .custom-search-button {
-        height: 48px; /* Adjust the height as needed */
+    /* Customize the appearance of the suggestion list */
+    .awesomplete ul {
+        background-color: #fff; /* Background color of the suggestion list */
+        border: 1px solid #ccc; /* Border around the suggestion list */
+        list-style: none; /* Remove bullets/dots */
+        padding: 0;
+        margin: 0;
+        max-height: 200px; /* Set a max height for the suggestion list to make it scroll if needed */
+        overflow-y: auto; /* Enable vertical scrolling when the list exceeds max height */
     }
 
-    /* Remove bullets (dots) from datalist options */
-    datalist option {
-        list-style: none;
+    /* Customize the appearance of each suggestion item */
+    .awesomplete ul li {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+    
+    .awesomplete ul li[aria-selected="true"] {
+        background-color: #007bff; 
+        color: #fff;
+    }
+
+    /* Fix the height of the input container to prevent resizing of the search button */
+    .input-group {
+        min-height: 48px; /* Set a minimum height to ensure the search button remains visible */
+    }
+
+    /* Set a fixed height for the search button */
+    .input-group button {
+        height: 100%; /* This ensures the button height matches the input container height */
     }
 </style>
 {% endblock customstyles %}

@@ -41,11 +41,11 @@
                         <div class="form-group">
                             <label>Place</label>
                             <input list="places" class="form-control" name="place" required>
-                            <datalist id="places">
-                                {% for place_obj in places %}
-                                    <option value="{{ place_obj.place }}">
-                                {% endfor %}
-                            </datalist>
+        <datalist id="places">
+            {% for place_obj in places %}
+                <option value="{{ place_obj.place }}">
+            {% endfor %}
+        </datalist>
                         </div>
                     </div>
                       <div class="col-12 col-sm-6">

@@ -152,11 +152,10 @@ def delete_customer_client(request, customer_id):
     return redirect('customer_list_admin')
 
 
-
 @login_required
 def add_turf_client(request):
-    return render(request,'client/addturf_client.html')
-
+    places = Places.objects.all()
+    return render(request, 'client/addturf_client.html', {'places': places})
 
 
   

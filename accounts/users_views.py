@@ -18,6 +18,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .forms import PasswordResetForm
 from django.contrib.auth import login
+from datetime import datetime
+import datetime as dt
 
 
 def home(request):
@@ -93,22 +95,20 @@ def available_time_slots(request, ground_id):
     return render(request, 'user/list_timeslot_user.html', {'ground': ground, 'time_slots': time_slots})
 
 
-
-
 @login_required
 def timeslot_list_user(request):
     selected_date = request.GET.get('selected_date')
     ground_id = request.GET.get('ground_id')
 
     if selected_date and ground_id:
-        selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+        selected_date = dt.datetime.strptime(selected_date, '%Y-%m-%d').date()
         ground = get_object_or_404(Ground, id=ground_id)
         timeslots = TimeSlot.objects.filter(ground=ground, date=selected_date, is_available=True)
     else:
         ground = None
         timeslots = TimeSlot.objects.none()
+    
     return render(request, 'user/list_timeslot_user.html', {'ground': ground, 'timeslots': timeslots, 'selected_date': selected_date})
-
 
 
 @login_required
