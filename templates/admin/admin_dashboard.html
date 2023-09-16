@@ -101,50 +101,57 @@
   </div>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-   // Fetch the data from Django context
-   const profitLabels = {{ profit_labels | safe }};
-   const profitValues = {{ profit_values | safe }};
-   const bookingLabels = {{ booking_labels | safe }};
-   const bookingValues = {{ booking_values | safe }};
-
-   // Create profit chart
-   const profitChartOptions = {
-       chart: {
-           type: "line",
-           height: 350,
-       },
-       xaxis: {
-           categories: profitLabels,
-       },
-       series: [
-           {
-               name: "Profit",
-               data: profitValues,
-           },
-       ],
-   };
-   new ApexCharts(document.querySelector("#profit-chart"), profitChartOptions).render();
-
-   // Create booking chart
-   const bookingChartOptions = {
-       chart: {
-           type: "bar",
-           height: 350,
-       },
-       xaxis: {
-           categories: bookingLabels,
-       },
-       series: [
-           {
-               name: "Number of Bookings",
-               data: bookingValues,
-           },
-       ],
-   };
-   new ApexCharts(document.querySelector("#booking-chart"), bookingChartOptions).render();
-});
-</script>
-
+   document.addEventListener("DOMContentLoaded", function () {
+      // Fetch the data from Django context
+      const profitLabels = {{ profit_labels | safe }};
+      const profitValues = {{ profit_values | safe }};
+      const bookingLabels = {{ booking_labels | safe }};
+      const bookingValues = {{ booking_values | safe }};
+   
+      // Create profit chart
+      const profitChartOptions = {
+          chart: {
+              type: "line",
+              height: 350,
+          },
+          xaxis: {
+              categories: profitLabels,
+          },
+          series: [
+              {
+                  name: "Profit",
+                  data: profitValues,
+              },
+          ],
+          // Hide the toolbar
+          toolbar: {
+              show: false,
+          },
+      };
+      new ApexCharts(document.querySelector("#profit-chart"), profitChartOptions).render();
+   
+      // Create booking chart
+      const bookingChartOptions = {
+          chart: {
+              type: "bar",
+              height: 350,
+          },
+          xaxis: {
+              categories: bookingLabels,
+          },
+          series: [
+              {
+                  name: "Number of Bookings",
+                  data: bookingValues,
+              },
+          ],
+          // Hide the toolbar
+          toolbar: {
+              show: false,
+          },
+      };
+      new ApexCharts(document.querySelector("#booking-chart"), bookingChartOptions).render();
+   });
+   </script>
 
 {% endblock maincontent %}
